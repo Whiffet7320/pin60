@@ -2,7 +2,7 @@
 	<view class="index">
 		<view class="items">
 			<view class="item" v-for="(item,i) in list" :key="item.id">
-				<image class="pic1" src="/static/组252@2x.png" mode=""></image>
+				<image class="pic1" src="/static/zu252@2x.png" mode=""></image>
 				<view class="nav1">
 					<view class="tit">
 						<view class="tit1"></view>

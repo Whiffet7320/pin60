@@ -18,7 +18,7 @@
 										<view class="tit2">{{item.orders_status}}</view>
 									</view>
 									<view class="nav2" v-for="(ele,i) in item.goods" :key="i">
-										<image class="pic1" :src="ele.goods_pic" mode=""></image>
+										<image @click=toxiangqin(ele) class="pic1" :src="ele.goods_pic" mode=""></image>
 										<view class="title">
 											<view class="tit1">
 												<view class="tit1-1">{{ele.goods_title}}</view>
@@ -49,7 +49,7 @@
 										<view class="tit2">{{item.orders_status}}</view>
 									</view>
 									<view class="nav2" v-for="(ele,i) in item.goods" :key="i">
-										<image class="pic1" :src="ele.goods_pic" mode=""></image>
+										<image @click=toxiangqin(ele) class="pic1" :src="ele.goods_pic" mode=""></image>
 										<view class="title">
 											<view class="tit1">
 												<view class="tit1-1">{{ele.goods_title}}</view>
@@ -76,7 +76,7 @@
 										<view class="tit2" style="color: #9BDF96;">{{item.orders_status}}</view>
 									</view>
 									<view class="nav2" v-for="(ele,i) in item.goods" :key="i">
-										<image class="pic1" :src="ele.goods_pic" mode=""></image>
+										<image @click=toxiangqin(ele) class="pic1" :src="ele.goods_pic" mode=""></image>
 										<view class="title">
 											<view class="tit1">
 												<view class="tit1-1">{{ele.goods_title}}</view>
@@ -108,7 +108,7 @@
 										<view class="tit2" style="color: #EBBFCC;">{{item.orders_status}}</view>
 									</view>
 									<view class="nav2" v-for="(ele,i) in item.goods" :key="i">
-										<image class="pic1" :src="ele.goods_pic" mode=""></image>
+										<image @click=toxiangqin(ele) class="pic1" :src="ele.goods_pic" mode=""></image>
 										<view class="title">
 											<view class="tit1">
 												<view class="tit1-1">{{ele.goods_title}}</view>
@@ -131,7 +131,7 @@
 									<view class="nav3">
 										<view class="tit1">下单时间：{{item.createtime}}</view>
 										<view class="tit2" style="background: #EBBFCC;" @tap="toPingjia">去评价</view>
-										<view class="tit2" style="background: #EBBFCC;" @tap="lijigoumai">确认收货</view>
+										<view class="tit2" style="background: #EBBFCC;" @tap="shouhuo(item)">确认收货</view>
 									</view>
 								</view>
 							</view>
@@ -143,7 +143,7 @@
 										<view class="tit2" style="color: #EBBFCC;">{{item.orders_status}}</view>
 									</view>
 									<view class="nav2" v-for="(ele,i) in item.goods" :key="i">
-										<image class="pic1" :src="ele.goods_pic" mode=""></image>
+										<image @click=toxiangqin(ele) class="pic1" :src="ele.goods_pic" mode=""></image>
 										<view class="title">
 											<view class="tit1">
 												<view class="tit1-1">{{ele.goods_title}}</view>
@@ -152,7 +152,7 @@
 											</view>
 											<view class="tit2-2">
 												<view class="tit2" @tap="toShenqinshouhou(item)">
-													申请售后
+													售后结果
 												</view>
 												<view class="tit3" v-if="item.orders_status!='待付款'"
 													@click="miandan(ele)">
@@ -166,7 +166,6 @@
 										<view class="tit1">下单时间：{{item.createtime}}</view>
 										<view class="tit2" style="background: #EBBFCC;" @tap="toPingjia(item)">去评价
 										</view>
-										<view class="tit2" style="background: #EBBFCC;" @tap="shouhuo(item)">确认收货</view>
 									</view>
 								</view>
 							</view>
@@ -182,30 +181,30 @@
 		<!-- 直接购买 -->
 		<u-popup class="zjgm" v-model="zjgmShow" mode="bottom" height="716">
 			<view class="container">
-				<image src="../../static/Path1.png" mode=""></image>
+				<image src="/static/Path1.png" mode=""></image>
 				<view class="tit1">立即购买</view>
 				<view class="close" @tap="closeZjgm">
-					<image src="../../static/组82.png" mode=""></image>
+					<image src="/static/zu82.png" mode=""></image>
 				</view>
 				<view class="bottom">
 					<u-radio-group wrap v-model="pay_type">
 						<u-radio name=1>
 							<view class="wx">
-								<image class="dibu" src="../../static/矩形139.png" mode=""></image>
-								<image class="wxpic" src="../../static/组137.png" mode=""></image>
+								<image class="dibu" src="/static/juxin139.png" mode=""></image>
+								<image class="wxpic" src="/static/zu137.png" mode=""></image>
 								<view class="tit">微信支付</view>
 							</view>
 						</u-radio>
 						<u-radio name=2>
 							<view class="zfb">
-								<image class="dibu" src="../../static/矩形139.png" mode=""></image>
-								<image class="wxpic" src="../../static/路径287.png" mode=""></image>
+								<image class="dibu" src="/static/juxin139.png" mode=""></image>
+								<image class="wxpic" src="/static/lujin287.png" mode=""></image>
 								<view class="tit">支付宝支付</view>
 							</view>
 						</u-radio>
 						<u-radio name=3>
 							<view class="zfb">
-								<image class="dibu" src="/static/矩形139.png" mode=""></image>
+								<image class="dibu" src="/static/juxin139.png" mode=""></image>
 								<u-icon class="wxpic" color="#EBBFCC" size="46" name="red-packet-fill"></u-icon>
 								<!-- <image class="wxpic" src="/static/路径287.png" mode=""></image> -->
 								<view class="tit">余额支付</view>
@@ -350,8 +349,21 @@
 					this.getCurrentSwiperHeight('.items');
 				}, 500)
 			},
+			// 点击图片跳转至购物车
+			toxiangqin(item) {
+				console.log(item)
+				uni.navigateTo({
+					url: `/pages/shangpinxiangqin/shangpinxiangqin?id=${item.goods_id}`
+				})
+			},
 			lower() {
 				this.$store.commit("ddPage", this.ddPage + 1);
+			},
+			// 提交售后
+			toTijiaoshouhou(item) {
+				uni.navigateTo({
+					url: `/shenqinshouhou/pages/tijiaoshenqing?order_id=${item.order_id}`
+				})
 			},
 			// 取消支付
 			async deldd(item) {
@@ -466,7 +478,7 @@
 				let query = uni.createSelectorQuery().in(this);
 				query.selectAll(element).boundingClientRect();
 				query.exec((res) => {
-					console.log(res)
+					console.log(res, 'res', this.swiperCurrentIndex)
 					this.height = 50 + res[0][this.swiperCurrentIndex].height;
 				})
 			},
@@ -480,19 +492,19 @@
 				this.zjgmShow = false
 			},
 			// 免单列表
-			async miandan(ele){
+			async miandan(ele) {
 				console.log(ele)
-				const res = await this.$api.wx_freeordersubmit(this.openid,ele.sub_orderid)
+				const res = await this.$api.wx_freeordersubmit(this.openid, ele.sub_orderid)
 				console.log(res)
 				if (res.result == 1) {
 					this.$refs.uToast.show({
 						title: res.msg,
 						type: 'success',
-						url:'/pages/miandan/miandan',
-						params:{
-							sub_orderid:ele.sub_orderid,
+						url: '/pages/miandan/miandan',
+						params: {
+							sub_orderid: ele.sub_orderid,
 						},
-						duration:500
+						duration: 500
 					})
 				} else {
 					this.$refs.uToast.show({
@@ -503,9 +515,16 @@
 			},
 			// 售后
 			toShenqinshouhou(item) {
-				uni.navigateTo({
-					url: `/shenqinshouhou/pages/shenqinshouhou?order_id=${item.order_id}`
-				})
+				if (item.is_examine == -1) {
+					uni.navigateTo({
+						url: `/shenqinshouhou/pages/shenqinshouhou?order_id=${item.order_id}`
+					})
+				} else {
+					uni.navigateTo({
+						url: `/shenqinshouhou/pages/tijiaoshenqing?order_id=${item.order_id}`
+					})
+				}
+
 			},
 			// 评价
 			toPingjia(item) {
@@ -527,6 +546,12 @@
 						title: res.msg,
 						type: 'success',
 					})
+					this.allList = [];
+					this.dfkList = [];
+					this.dfhList = [];
+					this.dshList = [];
+					this.ywcList = [];
+					this.getData()
 				} else {
 					this.$refs.uToast.show({
 						title: res.msg,
@@ -575,18 +600,21 @@
 
 	.container {
 		margin-top: 30rpx;
-		.item.md{
-			.title{
+
+		.item.md {
+			.title {
 				display: flex;
 				justify-content: space-between;
-				.tit2-2{
-					.tit2{
+
+				.tit2-2 {
+					.tit2 {
 						margin-top: 20rpx;
 						margin-bottom: 10rpx;
 					}
 				}
 			}
 		}
+
 		.items {
 			margin: 26rpx 22rpx;
 

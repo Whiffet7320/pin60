@@ -106,7 +106,8 @@
   opacity: 1;
   background: #ffffff;
   border-radius: 18rpx;
-  box-shadow: 0rpx 2rpx 4rpx 0rpx rgba(0, 0, 0, 0.16);
+  -webkit-box-shadow: 0rpx 2rpx 4rpx 0rpx rgba(0, 0, 0, 0.16);
+          box-shadow: 0rpx 2rpx 4rpx 0rpx rgba(0, 0, 0, 0.16);
   display: -webkit-box;
   display: -webkit-flex;
   display: flex;
@@ -184,7 +185,8 @@
   opacity: 1;
   background: #ffffff;
   border-radius: 18rpx;
-  box-shadow: 0rpx 2rpx 4rpx 0rpx rgba(0, 0, 0, 0.16);
+  -webkit-box-shadow: 0rpx 2rpx 4rpx 0rpx rgba(0, 0, 0, 0.16);
+          box-shadow: 0rpx 2rpx 4rpx 0rpx rgba(0, 0, 0, 0.16);
   display: -webkit-box;
   display: -webkit-flex;
   display: flex;
@@ -221,7 +223,8 @@
   height: 80rpx;
   opacity: 1;
   background: #ebbfcc;
-  box-shadow: 0rpx -2rpx 4rpx 0rpx rgba(0, 0, 0, 0.16);
+  -webkit-box-shadow: 0rpx -2rpx 4rpx 0rpx rgba(0, 0, 0, 0.16);
+          box-shadow: 0rpx -2rpx 4rpx 0rpx rgba(0, 0, 0, 0.16);
   font-size: 25rpx;
   font-family: SourceHanSansCN-Regular;
   text-align: center;

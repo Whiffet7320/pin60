@@ -95,17 +95,20 @@ __webpack_require__.r(__webpack_exports__);
 var components
 try {
   components = {
+    yomolUpgrade: function() {
+      return __webpack_require__.e(/*! import() | components/yomol-upgrade/yomol-upgrade */ "components/yomol-upgrade/yomol-upgrade").then(__webpack_require__.bind(null, /*! @/components/yomol-upgrade/yomol-upgrade.vue */ 307))
+    },
     uToast: function() {
-      return __webpack_require__.e(/*! import() | node-modules/uview-ui/components/u-toast/u-toast */ "node-modules/uview-ui/components/u-toast/u-toast").then(__webpack_require__.bind(null, /*! uview-ui/components/u-toast/u-toast.vue */ 291))
+      return __webpack_require__.e(/*! import() | node-modules/uview-ui/components/u-toast/u-toast */ "node-modules/uview-ui/components/u-toast/u-toast").then(__webpack_require__.bind(null, /*! uview-ui/components/u-toast/u-toast.vue */ 314))
     },
     uInput: function() {
-      return Promise.all(/*! import() | node-modules/uview-ui/components/u-input/u-input */[__webpack_require__.e("common/vendor"), __webpack_require__.e("node-modules/uview-ui/components/u-input/u-input")]).then(__webpack_require__.bind(null, /*! uview-ui/components/u-input/u-input.vue */ 298))
+      return Promise.all(/*! import() | node-modules/uview-ui/components/u-input/u-input */[__webpack_require__.e("common/vendor"), __webpack_require__.e("node-modules/uview-ui/components/u-input/u-input")]).then(__webpack_require__.bind(null, /*! uview-ui/components/u-input/u-input.vue */ 321))
     },
     uSwiper: function() {
-      return __webpack_require__.e(/*! import() | node-modules/uview-ui/components/u-swiper/u-swiper */ "node-modules/uview-ui/components/u-swiper/u-swiper").then(__webpack_require__.bind(null, /*! uview-ui/components/u-swiper/u-swiper.vue */ 306))
+      return __webpack_require__.e(/*! import() | node-modules/uview-ui/components/u-swiper/u-swiper */ "node-modules/uview-ui/components/u-swiper/u-swiper").then(__webpack_require__.bind(null, /*! uview-ui/components/u-swiper/u-swiper.vue */ 329))
     },
-    uIcon: function() {
-      return __webpack_require__.e(/*! import() | node-modules/uview-ui/components/u-icon/u-icon */ "node-modules/uview-ui/components/u-icon/u-icon").then(__webpack_require__.bind(null, /*! uview-ui/components/u-icon/u-icon.vue */ 313))
+    uTabbar: function() {
+      return __webpack_require__.e(/*! import() | node-modules/uview-ui/components/u-tabbar/u-tabbar */ "node-modules/uview-ui/components/u-tabbar/u-tabbar").then(__webpack_require__.bind(null, /*! uview-ui/components/u-tabbar/u-tabbar.vue */ 336))
     }
   }
 } catch (e) {
@@ -162,126 +165,273 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _regenerator = _interopRequireDefault(__webpack_require__(/*! ./node_modules/@babel/runtime/regenerator */ 19));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {Promise.resolve(value).then(_next, _throw);}}function _asyncToGenerator(fn) {return function () {var self = this,args = arguments;return new Promise(function (resolve, reject) {var gen = fn.apply(self, args);function _next(value) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);}function _throw(err) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);}_next(undefined);});};} //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-var _default =
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _regenerator = _interopRequireDefault(__webpack_require__(/*! ./node_modules/@babel/runtime/regenerator */ 19));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {Promise.resolve(value).then(_next, _throw);}}function _asyncToGenerator(fn) {return function () {var self = this,args = arguments;return new Promise(function (resolve, reject) {var gen = fn.apply(self, args);function _next(value) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);}function _throw(err) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);}_next(undefined);});};}var yomolUpgrade = function yomolUpgrade() {__webpack_require__.e(/*! require.ensure | components/yomol-upgrade/yomol-upgrade */ "components/yomol-upgrade/yomol-upgrade").then((function () {return resolve(__webpack_require__(/*! @/components/yomol-upgrade/yomol-upgrade.vue */ 307));}).bind(null, __webpack_require__)).catch(__webpack_require__.oe);};var _default =
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 {
+  components: {
+    yomolUpgrade: yomolUpgrade },
+
   data: function data() {
     return {
+      // 升级
+      upgradeType: 'pkg', //pkg 整包 wgt 升级包
+      upgradeContent: '123', //更新内容
+      upgradeUrl: '', //更新地址
+      // 
       searchVal: '',
       bannerList: [
-      '../../static/hongbaobanner.png',
-      '../../static/img@2x.png'],
+      '/static/hongbaobanner.png',
+      '/static/img@2x.png'],
 
       swiperList: [],
       bannerlist: [],
-      list: [] };
+      list: [],
+      tabbarlist: [{
+        iconPath: "/static/shouye.png",
+        selectedIconPath: "/static/shouye-active.png",
+        text: '首页',
+        midButton: true,
+        pagePath: "/pages/index/index" },
+
+      {
+        iconPath: "/static/miandan.png",
+        selectedIconPath: "/static/miandan-active.png",
+        text: '免单',
+        customIcon: false,
+        pagePath: "/pages/freeCharge/freeCharge" },
+
+      {
+        iconPath: "/static/zu27.png",
+        selectedIconPath: "static/zu242.png",
+        text: '购物车',
+        customIcon: false,
+        pagePath: "/pages/gouwuche/gouwuche" },
+
+      {
+        iconPath: "/static/zu243.png",
+        selectedIconPath: "/static/zu245.png",
+        text: '我的',
+        customIcon: false,
+        pagePath: "/pages/wode/wode" }],
+
+
+      current: 0 };
 
   },
-  onLoad: function onLoad() {
+  //用户点击右上角分享转发
+  onShareAppMessage: function () {var _onShareAppMessage = _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee() {var res, title;return _regenerator.default.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:_context.next = 2;return (
+                this.$api.wx_sharetouserid(this.openid));case 2:res = _context.sent;
+              console.log(res);
 
+              title = '拼60商城app'; //data，return 数据title
+              return _context.abrupt("return", {
+                title: title || '',
+                path: "/pages/index/index?scene=0_".concat(res.share_userid) });case 6:case "end":return _context.stop();}}}, _callee, this);}));function onShareAppMessage() {return _onShareAppMessage.apply(this, arguments);}return onShareAppMessage;}(),
+
+
+  //用户点击右上角分享朋友圈
+  onShareTimeline: function () {var _onShareTimeline = _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee2() {var res, title;return _regenerator.default.wrap(function _callee2$(_context2) {while (1) {switch (_context2.prev = _context2.next) {case 0:_context2.next = 2;return (
+                this.$api.wx_sharetouserid(this.openid));case 2:res = _context2.sent;
+              console.log(res);
+              title = '拼60商城app'; //data，return 数据title
+              return _context2.abrupt("return", {
+                title: title || '',
+                path: "/pages/index/index?scene=0_".concat(res.share_userid) });case 6:case "end":return _context2.stop();}}}, _callee2, this);}));function onShareTimeline() {return _onShareTimeline.apply(this, arguments);}return onShareTimeline;}(),
+
+
+  onLoad: function onLoad(option) {var _this = this;return _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee3() {var upid, res, _res, arr, signstr, md51, md52, md, resp;return _regenerator.default.wrap(function _callee3$(_context3) {while (1) {switch (_context3.prev = _context3.next) {case 0:if (!(
+
+
+              uni.getSystemInfoSync().platform == 'ios')) {_context3.next = 15;break;}
+              upid = 2;_context3.next = 4;return (
+                _this.$api.app_upgrade({
+                  upid: upid,
+                  version: plus.runtime.version }));case 4:res = _context3.sent;
+
+              console.log(res);if (!(
+              res.result == 1)) {_context3.next = 12;break;}if (!(
+              res.is_upgrade == 0)) {_context3.next = 11;break;}return _context3.abrupt("return");case 11:
+
+              if (res.is_upgrade == 1) {
+                _this.upgradeType = 'pkg';
+                _this.upgradeContent = res.upgrade_contents;
+                _this.upgradeUrl = res.down_url;
+                _this.$refs.yomolUpgrade.show();
+              }case 12:
+              ;_context3.next = 31;break;case 15:if (!(
+              uni.getSystemInfoSync().platform === 'android')) {_context3.next = 30;break;}
+              upid = 1;_context3.next = 19;return (
+                _this.$api.app_upgrade({
+                  upid: upid,
+                  version: plus.runtime.version }));case 19:_res = _context3.sent;
+
+              console.log(_res);if (!(
+              _res.result == 1)) {_context3.next = 27;break;}if (!(
+              _res.is_upgrade == 0)) {_context3.next = 26;break;}return _context3.abrupt("return");case 26:
+
+              if (_res.is_upgrade == 1) {
+                _this.upgradeType = 'pkg';
+                _this.upgradeContent = _res.upgrade_contents;
+                _this.upgradeUrl = _res.down_url;
+                _this.$refs.yomolUpgrade.show();
+              }case 27:
+              ;_context3.next = 31;break;case 30:return _context3.abrupt("return");case 31:
+
+
+
+              // 
+              _this.openid = uni.getStorageSync('openid');
+              console.log(option);if (!
+              option.scene) {_context3.next = 51;break;}
+              arr = option.scene.split('_');
+              uni.setStorageSync('scene', arr[1]);
+              uni.setStorageSync('myUserId', arr[1]);if (!
+              _this.openid) {_context3.next = 48;break;}
+              signstr = "openid=" + _this.openid + "&recommend_userid=" + arr[1] + "";
+              md51 = _this.$md5(signstr);
+              md52 = md51 + _this.$apikey;
+              md = _this.$md5(md52).toUpperCase();_context3.next = 44;return (
+                _this.$api.wx_userrecommend(
+                _this.openid,
+                arr[1],
+                md));case 44:resp = _context3.sent;
+
+              console.log(resp);_context3.next = 49;break;case 48:
+
+              uni.navigateTo({
+                url: "/weixinshouquan/pages/weixinshouquan?recommend_userid=".concat(arr[1]) });case 49:_context3.next = 52;break;case 51:
+
+
+
+              uni.setStorageSync('scene', 0);case 52:
+
+              console.log(uni.getStorageSync('scene'));
+              _this.getData();case 54:case "end":return _context3.stop();}}}, _callee3);}))();
   },
   created: function created() {
     this.getData();
   },
   methods: {
-    getData: function getData() {var _this = this;return _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee() {var res;return _regenerator.default.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:_context.next = 2;return (
-                  _this.$api.wx_index());case 2:res = _context.sent;
+    getData: function getData() {var _this2 = this;return _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee4() {var res;return _regenerator.default.wrap(function _callee4$(_context4) {while (1) {switch (_context4.prev = _context4.next) {case 0:_context4.next = 2;return (
+
+                  _this2.$api.wx_index());case 2:res = _context4.sent;
                 console.log(res);
-                _this.swiperList = [res.swiperList.first_pic, res.swiperList.second_pic, res.swiperList.third_pic];
-                _this.bannerlist = res.bannerlist;
-                _this.list = res.list;case 7:case "end":return _context.stop();}}}, _callee);}))();
+                _this2.swiperList = [res.swiperList.first_pic, res.swiperList.second_pic, res.swiperList.third_pic];
+                _this2.bannerlist = res.bannerlist;
+                _this2.list = res.list;case 7:case "end":return _context4.stop();}}}, _callee4);}))();
     },
     onSearch: function onSearch() {
       if (this.searchVal != '') {

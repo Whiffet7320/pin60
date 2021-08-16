@@ -8,15 +8,16 @@
 		<view class="nav2">
 			<view class="items">
 				<view class="item">
-					<image @click="qxshoucang" v-if="collect_status == 1" class="pic1" src="/static/路径180.png" mode="">
+					<image @click="qxshoucang" v-if="collect_status == 1" class="pic1" src="/static/lujin180.png"
+						mode="">
 					</image>
-					<image @click="shoucang" v-if="collect_status == 0" class="pic1" src="/static/路径23.png" mode="">
+					<image @click="shoucang" v-if="collect_status == 0" class="pic1" src="/static/lujin23.png" mode="">
 					</image>
 					<view class="tit">收藏</view>
 				</view>
 				<view class="shu"></view>
 				<view class="item" @click="addShopCar">
-					<image class="pic2" src="/static/组65.png" mode=""></image>
+					<image class="pic2" src="/static/zu65.png" mode=""></image>
 					<view class="tit">加入购物车</view>
 				</view>
 				<view class="shu"></view>
@@ -62,9 +63,9 @@
 					<u-icon name="arrow-down" color="#4a4a4a" size="30"></u-icon>
 				</view>
 				<view class="item">
-					<view class="tit2">数量</view>
+					<view class="tit2" style="width: 80rpx;">数量</view>
 					<!-- <u-icon name="arrow-down" color="#4a4a4a" size="30"></u-icon> -->
-					<u-input v-model="num" placeholder="" clearable=false type="text" border />
+					<u-input style="width: 160rpx;" v-model="num" placeholder="" clearable=false type="text" border />
 				</view>
 			</view>
 		</view>
@@ -72,7 +73,7 @@
 		<u-select @confirm="colorConfirm" v-model="colorShow" :list="color"></u-select>
 		<view class="nav6">
 			<view class="tit1">物流</view>
-			<view class="tit2">预计7-10个工作日内送达</view>
+			<view class="tit2">预计3-10个工作日内送达</view>
 		</view>
 		<view class="nav7" @click="toPingjia">
 			<view class="tit1">产品评价</view>
@@ -82,7 +83,7 @@
 			<view class="tit1">产品详情</view>
 		</view>
 		<view class="container">
-			<!-- <image src="../../static/vv.png" mode=""></image> -->
+			<!-- <image src="/static/vv.png" mode=""></image> -->
 			<u-parse :html="content"></u-parse>
 		</view>
 		<view class="footer">
@@ -95,13 +96,33 @@
 				<view @tap="toMiandangoumai" class="item2">免单购买</view>
 			</view>
 		</view>
+		<!-- 免单购买跳转至登录 -->
+		<u-popup class='zhidl' z-index="99999" v-model="newmdgmshow" mode="center" border-radius="14">
+			<view class="zhidl2">
+				<view class="tit1">您还未登录，是否去登录？</view>
+				<view class="btns">
+					<u-button size="mini" type="success" @click='qd'>去登录</u-button>
+					<u-button size="mini" @click='qxqd'>取消</u-button>
+				</view>
+			</view>
+		</u-popup>
+		<!-- 直接购买跳转至登录 -->
+		<u-popup class='zhidl' z-index="99999" v-model="newzjgmshow" mode="center" border-radius="14">
+			<view class="zhidl2">
+				<view class="tit1">您还未登录，是否去登录？</view>
+				<view class="btns">
+					<u-button size="mini" type="success" @click='qd'>去登录</u-button>
+					<u-button size="mini" @click='qxqd'>取消</u-button>
+				</view>
+			</view>
+		</u-popup>
 		<!-- 免单购买 -->
 		<u-popup class="mdgm" v-model="mdgmShow" mode="bottom" height="1065">
 			<view class="container">
-				<!-- <image src="../../static/Path.png" mode=""></image> -->
+				<!-- <image src="/static/Path.png" mode=""></image> -->
 				<view class="tit1">免单购买协议</view>
 				<view class="close" @tap="closeMdgm">
-					<image src="../../static/组82.png" mode=""></image>
+					<image src="/static/zu82.png" mode=""></image>
 				</view>
 				<view class="center">
 					<u-parse :html="mdContent"></u-parse>
@@ -144,27 +165,27 @@
 		<!-- 直接购买 -->
 		<u-popup class="zjgm" v-model="zjgmShow" mode="bottom" height="716">
 			<view class="container">
-				<image src="../../static/Path1.png" mode=""></image>
+				<image src="/static/Path1.png" mode=""></image>
 				<view class="tit1">立即购买</view>
 				<view class="close" @tap="closeZjgm">
-					<image src="../../static/组82.png" mode=""></image>
+					<image src="/static/zu82.png" mode=""></image>
 				</view>
 				<view class="bottom">
 					<u-radio-group wrap v-model="value" @change="radioGroupChange">
 						<u-radio name="wx">
 							<view class="wx">
-								<image class="dibu" src="../../static/矩形139.png" mode=""></image>
-								<image class="wxpic" src="../../static/组137.png" mode=""></image>
+								<image class="dibu" src="/static/juxin139.png" mode=""></image>
+								<image class="wxpic" src="/static/zu137.png" mode=""></image>
 								<view class="tit">微信支付</view>
 							</view>
 						</u-radio>
-						<u-radio name="zfb">
+						<!-- <u-radio name="zfb">
 							<view class="zfb">
-								<image class="dibu" src="../../static/矩形139.png" mode=""></image>
-								<image class="wxpic" src="../../static/路径287.png" mode=""></image>
+								<image class="dibu" src="/static/juxin139.png" mode=""></image>
+								<image class="wxpic" src="/static/lujin287.png" mode=""></image>
 								<view class="tit">支付宝支付</view>
 							</view>
-						</u-radio>
+						</u-radio> -->
 					</u-radio-group>
 				</view>
 			</view>
@@ -177,6 +198,7 @@
 		<!-- 分享 -->
 		<u-popup v-model="fenxiangShow" mode="center" border-radius="14">
 			<image class="fxImg" :src="fenxiangImgSrc" mode=""></image>
+			<button @click="downImg" class="downImg">下载到本地</button>
 		</u-popup>
 	</view>
 </template>
@@ -185,12 +207,15 @@
 	export default {
 		data() {
 			return {
+				newmdgmshow: false,
+				newzjgmshow: false,
 				openid: '',
 				goods_id: '',
 				zjgmShow: false,
 				mdgmShow: false,
 				fenxiangShow: false,
 				fenxiangImgSrc: '',
+				imgDownSrc: '',
 				checked: false,
 				// 轮播图
 				pic: [],
@@ -231,19 +256,41 @@
 			}
 		},
 		async onLoad(option) {
-			this.openid = uni.getStorageSync('openid')
+			this.openid = uni.getStorageSync('openid');
 			this.goods_id = option.id;
 			if (option.scene) {
 				const arr = option.scene.split('_')
 				uni.setStorageSync('scene', arr[1])
+				this.goods_id = arr[0];
+				uni.setStorageSync('myUserId', arr[1])
+				if (this.openid) {
+					var signstr = "openid=" + this.openid + "&recommend_userid=" + arr[1] + "";
+					const md51 = this.$md5(signstr);
+					const md52 = md51 + this.$apikey;
+					const md = this.$md5(md52).toUpperCase()
+					const resp = await this.$api.wx_userrecommend(
+						this.openid,
+						arr[1],
+						md
+					)
+					console.log(resp)
+				} else {
+					uni.navigateTo({
+						url: `/weixinshouquan/pages/weixinshouquan?recommend_userid=${arr[1]}&goods_id=${this.goods_id}`
+					})
+				}
 			} else {
 				uni.setStorageSync('scene', 0)
 			}
+			console.log(uni.getStorageSync('scene'))
 			this.getData()
+		},
+		onShow(){
+			console.log(this.goods_id,'onshow')
 		},
 		methods: {
 			async getData() {
-				const res = await this.$api.wx_goodsview(this.goods_id,this.openid)
+				const res = await this.$api.wx_goodsview(this.goods_id, this.openid)
 				console.log(res)
 				this.priceNum = this.num * res.price + res.postage;
 				res.size.forEach(ele => {
@@ -313,15 +360,42 @@
 					})
 				}
 			},
+			downImg() {
+				const that = this;
+				uni.downloadFile({
+					url: that.imgDownSrc,
+					success(res) {
+						console.log(res)
+						uni.saveImageToPhotosAlbum({
+							filePath: res.tempFilePath,
+							success() {
+								console.log(res.tempFilePath, '成功')
+								that.$refs.uToast.show({
+									title: '已保存至相册',
+									type: 'success',
+								})
+							},
+							fail(res) {
+								console.log('fail')
+							},
+						})
+					}
+				})
+			},
 			async fenxiang() {
+				uni.showLoading({
+					title: '加载中'
+				});
 				this.fenxiangShow = true;
 				var signstr = "openid=" + this.openid + "&goods_id=" + this.goods_id + "";
 				const md51 = this.$md5(signstr);
 				const md52 = md51 + this.$apikey;
 				const md = this.$md5(md52).toUpperCase()
 				const res = await this.$api.wx_shareqr(this.openid, this.goods_id, md)
-				console.log(res)
-				this.fenxiangImgSrc = res.picbase64;
+				console.log(res, 'cyy111')
+				this.fenxiangImgSrc = res.pic_url;
+				this.imgDownSrc = res.pic_url;
+				uni.hideLoading();
 			},
 			// 加入购物车
 			async addShopCar() {
@@ -393,10 +467,15 @@
 						duration: 500
 					})
 				} else {
-					this.$refs.uToast.show({
-						title: res.msg,
-						type: 'warning',
-					})
+					if (res.msg == '请传入openid') {
+						this.newzjgmshow = true;
+
+					} else {
+						this.$refs.uToast.show({
+							title: res.msg,
+							type: 'warning',
+						})
+					}
 				}
 			},
 			// 免单购买
@@ -434,11 +513,27 @@
 					}
 
 				} else {
-					this.$refs.uToast.show({
-						title: res.msg,
-						type: 'warning',
-					})
+					if (res.msg == '请传入openid') {
+						this.newmdgmshow = true;
+
+					} else {
+						this.$refs.uToast.show({
+							title: res.msg,
+							type: 'warning',
+						})
+					}
 				}
+			},
+			// 跳转至登录
+			qd() {
+				uni.navigateTo({
+					url: '/weixinshouquan/pages/weixinshouquan'
+				})
+			},
+			// 取消登录
+			qxqd() {
+				this.newmdgmshow = false;
+				this.newzjgmshow = false;
 			},
 			closeZjgm() {
 				this.zjgmShow = false
@@ -466,6 +561,21 @@
 </script>
 
 <style scoped lang="scss">
+	.zhidl {
+		.zhidl2 {
+			padding: 40rpx;
+
+			.tit1 {
+				margin-bottom: 16rpx;
+			}
+
+			.btns {
+				display: flex;
+				justify-content: space-around;
+			}
+		}
+	}
+
 	.nav {
 		position: relative;
 
@@ -717,6 +827,7 @@
 		width: 748rpx;
 		height: 770rpx;
 		opacity: 1;
+		padding: 20rpx 44rpx;
 
 		image {
 			width: 100%;
@@ -726,9 +837,9 @@
 
 	.footer {
 		position: fixed;
-		bottom: 0;
+		bottom: 0rpx;
 		width: 100%;
-		height: 80rpx;
+		height: 110rpx;
 		opacity: 1;
 		background: #ffffff;
 		display: flex;
@@ -760,14 +871,14 @@
 		.right {
 			display: flex;
 			align-items: center;
-			height: 80rpx;
+			height: 110rpx;
 
 			.item1 {
 				display: flex;
 				align-items: center;
 				justify-content: center;
 				width: 223rpx;
-				height: 80rpx;
+				height: 110rpx;
 				opacity: 1;
 				background: #f6f6f6;
 				font-size: 25rpx;
@@ -784,7 +895,7 @@
 				align-items: center;
 				justify-content: center;
 				width: 223rpx;
-				height: 80rpx;
+				height: 110rpx;
 				opacity: 1;
 				background: #ebbfcc;
 				font-size: 25rpx;
@@ -1051,5 +1162,9 @@
 	.fxImg {
 		width: 414rpx;
 		height: 736rpx;
+	}
+
+	.downImg {
+		font-size: 25rpx;
 	}
 </style>

@@ -1,6 +1,6 @@
 <template>
 	<view class="index">
-		<image class="index-pic" src="../img/蒙版组116@2x.png" mode=""></image>
+		<image class="index-pic" src="../img/mcz116@2x.png" mode=""></image>
 		<view class="nav">
 			<u-icon @click="goTo" color="#ffffff" name="arrow-left" size="30"></u-icon>
 			<view class="nav-title">邀请好友</view>

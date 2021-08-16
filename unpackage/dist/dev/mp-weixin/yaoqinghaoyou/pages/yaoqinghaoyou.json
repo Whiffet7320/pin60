@@ -2,6 +2,8 @@
   "navigationBarTitleText": "邀请好友",
   "enablePullDownRefresh": false,
   "usingComponents": {
+    "u-toast": "/node-modules/uview-ui/components/u-toast/u-toast",
+    "u-notice-bar": "/node-modules/uview-ui/components/u-notice-bar/u-notice-bar",
     "u-popup": "/node-modules/uview-ui/components/u-popup/u-popup"
   }
 }

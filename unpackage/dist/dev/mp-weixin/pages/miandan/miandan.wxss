@@ -25,14 +25,15 @@
 /* 透明度 */
 /* 文章场景相关 */
 .index .banner.data-v-7e679550 {
-  width: calc(1.82 * 414rpx);
-  height: calc(1.82 * 172rpx);
-  opacity: 1;
   position: relative;
 }
 .index .banner .nav-banner.data-v-7e679550 {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 750rpx;
+  height: 493rpx;
+  opacity: 1;
   position: absolute;
 }
 .index .banner .fanhui.data-v-7e679550 {
@@ -41,6 +42,53 @@
   margin-top: calc(1.82 * 48rpx);
   margin-left: calc(1.82 * 27rpx);
   opacity: 1;
+}
+.index .banner .banPic.data-v-7e679550 {
+  position: absolute;
+  top: 87rpx;
+  left: 317rpx;
+  width: 118rpx;
+  height: 118rpx;
+  opacity: 1;
+}
+.index .banner .tit1.data-v-7e679550 {
+  position: absolute;
+  top: 232rpx;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
+  opacity: 1;
+  font-size: 27rpx;
+  font-family: PingFang SC, PingFang SC-Bold;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 2rpx;
+}
+.index .banner .tit2.data-v-7e679550 {
+  position: absolute;
+  top: 286rpx;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
+  opacity: 1;
+  font-size: 18rpx;
+  font-family: SourceHanSansCN-Regular;
+  text-align: center;
+  color: #ffffff;
+  letter-spacing: 0rpx;
+}
+.index .banner .tit3.data-v-7e679550 {
+  position: absolute;
+  top: 353rpx;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
+  opacity: 1;
+  font-size: 18rpx;
+  font-family: SourceHanSansCN-Regular;
+  color: #ffffff;
+  line-height: 31rpx;
+  letter-spacing: 0rpx;
 }
 .index .center.data-v-7e679550 {
   position: relative;
@@ -124,13 +172,14 @@
   margin-left: 50%;
   -webkit-transform: translateX(-50%);
           transform: translateX(-50%);
-  margin-top: calc(1.82 * 233rpx);
+  margin-top: 270rpx;
   width: calc(1.82 * 374rpx);
   height: calc(1.82 * 458rpx);
   opacity: 1;
   background: #ffffff;
   border-radius: calc(1.82 * 20rpx);
-  box-shadow: 0rpx 2rpx 4rpx 0rpx rgba(0, 0, 0, 0.16);
+  -webkit-box-shadow: 0rpx 2rpx 4rpx 0rpx rgba(0, 0, 0, 0.16);
+          box-shadow: 0rpx 2rpx 4rpx 0rpx rgba(0, 0, 0, 0.16);
   display: inline-block;
 }
 .index .footer .tit11.data-v-7e679550 {

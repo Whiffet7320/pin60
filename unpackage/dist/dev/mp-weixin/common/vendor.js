@@ -10,6 +10,56 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });exports.createApp = createApp;exports.createComponent = createComponent;exports.createPage = createPage;exports.createPlugin = createPlugin;exports.createSubpackageApp = createSubpackageApp;exports.default = void 0;var _vue = _interopRequireDefault(__webpack_require__(/*! vue */ 2));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function ownKeys(object, enumerableOnly) {var keys = Object.keys(object);if (Object.getOwnPropertySymbols) {var symbols = Object.getOwnPropertySymbols(object);if (enumerableOnly) symbols = symbols.filter(function (sym) {return Object.getOwnPropertyDescriptor(object, sym).enumerable;});keys.push.apply(keys, symbols);}return keys;}function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};if (i % 2) {ownKeys(Object(source), true).forEach(function (key) {_defineProperty(target, key, source[key]);});} else if (Object.getOwnPropertyDescriptors) {Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));} else {ownKeys(Object(source)).forEach(function (key) {Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));});}}return target;}function _slicedToArray(arr, i) {return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();}function _nonIterableRest() {throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}function _iterableToArrayLimit(arr, i) {if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;var _arr = [];var _n = true;var _d = false;var _e = undefined;try {for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {_arr.push(_s.value);if (i && _arr.length === i) break;}} catch (err) {_d = true;_e = err;} finally {try {if (!_n && _i["return"] != null) _i["return"]();} finally {if (_d) throw _e;}}return _arr;}function _arrayWithHoles(arr) {if (Array.isArray(arr)) return arr;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}function _toConsumableArray(arr) {return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();}function _nonIterableSpread() {throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");}function _unsupportedIterableToArray(o, minLen) {if (!o) return;if (typeof o === "string") return _arrayLikeToArray(o, minLen);var n = Object.prototype.toString.call(o).slice(8, -1);if (n === "Object" && o.constructor) n = o.constructor.name;if (n === "Map" || n === "Set") return Array.from(o);if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);}function _iterableToArray(iter) {if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);}function _arrayWithoutHoles(arr) {if (Array.isArray(arr)) return _arrayLikeToArray(arr);}function _arrayLikeToArray(arr, len) {if (len == null || len > arr.length) len = arr.length;for (var i = 0, arr2 = new Array(len); i < len; i++) {arr2[i] = arr[i];}return arr2;}
 
+function b64DecodeUnicode(str) {
+  return decodeURIComponent(atob(str).split('').map(function (c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+  }).join(''));
+}
+
+function getCurrentUserInfo() {
+  var token = wx.getStorageSync('uni_id_token') || '';
+  var tokenArr = token.split('.');
+  if (!token || tokenArr.length !== 3) {
+    return {
+      uid: null,
+      role: [],
+      permission: [],
+      tokenExpired: 0 };
+
+  }
+  var userInfo;
+  try {
+    userInfo = JSON.parse(b64DecodeUnicode(tokenArr[1]));
+  } catch (error) {
+    throw new Error('获取当前用户信息出错，详细错误信息为：' + error.message);
+  }
+  userInfo.tokenExpired = userInfo.exp * 1000;
+  delete userInfo.exp;
+  delete userInfo.iat;
+  return userInfo;
+}
+
+function uniIdMixin(Vue) {
+  Vue.prototype.uniIDHasRole = function (roleId) {var _getCurrentUserInfo =
+
+
+    getCurrentUserInfo(),role = _getCurrentUserInfo.role;
+    return role.indexOf(roleId) > -1;
+  };
+  Vue.prototype.uniIDHasPermission = function (permissionId) {var _getCurrentUserInfo2 =
+
+
+    getCurrentUserInfo(),permission = _getCurrentUserInfo2.permission;
+    return this.uniIDHasRole('admin') || permission.indexOf(permissionId) > -1;
+  };
+  Vue.prototype.uniIDTokenValid = function () {var _getCurrentUserInfo3 =
+
+
+    getCurrentUserInfo(),tokenExpired = _getCurrentUserInfo3.tokenExpired;
+    return tokenExpired > Date.now();
+  };
+}
+
 var _toString = Object.prototype.toString;
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -822,7 +872,7 @@ function initData(vueOptions, context) {
     try {
       data = data.call(context); // 支持 Vue.prototype 上挂的数据
     } catch (e) {
-      if (Object({"VUE_APP_NAME":"shop","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
+      if (Object({"NODE_ENV":"development","VUE_APP_NAME":"shop","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG) {
         console.warn('根据 Vue 的 data 函数初始化小程序 data 失败，请尽量确保 data 函数中不访问 vm 对象，否则可能影响首次数据渲染速度。', data);
       }
     }
@@ -928,6 +978,11 @@ function initProperties(props) {var isBehavior = arguments.length > 1 && argumen
     properties.generic = {
       type: Object,
       value: null };
+
+    // scopedSlotsCompiler auto
+    properties.scopedSlotsCompiler = {
+      type: String,
+      value: '' };
 
     properties.vueSlots = { // 小程序不能直接定义 $slots 的 props，所以通过 vueSlots 转换到 $slots
       type: null,
@@ -1324,11 +1379,14 @@ function initScopedSlotsParams() {
   };
 
   _vue.default.prototype.$setScopedSlotsParams = function (name, value) {
-    var vueId = this.$options.propsData.vueId;
-    var object = center[vueId] = center[vueId] || {};
-    object[name] = value;
-    if (parents[vueId]) {
-      parents[vueId].$forceUpdate();
+    var vueIds = this.$options.propsData.vueId;
+    if (vueIds) {
+      var vueId = vueIds.split(',')[0];
+      var object = center[vueId] = center[vueId] || {};
+      object[name] = value;
+      if (parents[vueId]) {
+        parents[vueId].$forceUpdate();
+      }
     }
   };
 
@@ -1355,6 +1413,7 @@ function parseBaseApp(vm, _ref3)
   if (vm.$options.store) {
     _vue.default.prototype.$store = vm.$options.store;
   }
+  uniIdMixin(_vue.default);
 
   _vue.default.prototype.mpHost = "mp-weixin";
 
@@ -1733,6 +1792,7 @@ function createSubpackageApp(vm) {
   var app = getApp({
     allowDefault: true });
 
+  vm.$scope = app;
   var globalData = app.globalData;
   if (globalData) {
     Object.keys(appOptions.globalData).forEach(function (name) {
@@ -1748,17 +1808,17 @@ function createSubpackageApp(vm) {
   });
   if (isFn(appOptions.onShow) && wx.onAppShow) {
     wx.onAppShow(function () {for (var _len5 = arguments.length, args = new Array(_len5), _key5 = 0; _key5 < _len5; _key5++) {args[_key5] = arguments[_key5];}
-      appOptions.onShow.apply(app, args);
+      vm.__call_hook('onShow', args);
     });
   }
   if (isFn(appOptions.onHide) && wx.onAppHide) {
     wx.onAppHide(function () {for (var _len6 = arguments.length, args = new Array(_len6), _key6 = 0; _key6 < _len6; _key6++) {args[_key6] = arguments[_key6];}
-      appOptions.onHide.apply(app, args);
+      vm.__call_hook('onHide', args);
     });
   }
   if (isFn(appOptions.onLaunch)) {
     var args = wx.getLaunchOptionsSync && wx.getLaunchOptionsSync();
-    appOptions.onLaunch.call(app, args);
+    vm.__call_hook('onLaunch', args);
   }
   return vm;
 }
@@ -8404,7 +8464,8 @@ function _diff(current, pre, path, result) {
                 var currentType = type(currentValue);
                 var preType = type(preValue);
                 if (currentType != ARRAYTYPE && currentType != OBJECTTYPE) {
-                    if (currentValue != pre[key]) {
+                    // NOTE 此处将 != 修改为 !==。涉及地方太多恐怕测试不到，如果出现数据对比问题，将其修改回来。
+                    if (currentValue !== pre[key]) {
                         setResult(result, (path == '' ? '' : path + ".") + key, currentValue);
                     }
                 } else if (currentType == ARRAYTYPE) {
@@ -8463,7 +8524,7 @@ function type(obj) {
 
 function flushCallbacks$1(vm) {
     if (vm.__next_tick_callbacks && vm.__next_tick_callbacks.length) {
-        if (Object({"VUE_APP_NAME":"shop","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
+        if (Object({"NODE_ENV":"development","VUE_APP_NAME":"shop","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG) {
             var mpInstance = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + vm._uid +
                 ']:flushCallbacks[' + vm.__next_tick_callbacks.length + ']');
@@ -8484,14 +8545,14 @@ function nextTick$1(vm, cb) {
     //1.nextTick 之前 已 setData 且 setData 还未回调完成
     //2.nextTick 之前存在 render watcher
     if (!vm.__next_tick_pending && !hasRenderWatcher(vm)) {
-        if(Object({"VUE_APP_NAME":"shop","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG){
+        if(Object({"NODE_ENV":"development","VUE_APP_NAME":"shop","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG){
             var mpInstance = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + vm._uid +
                 ']:nextVueTick');
         }
         return nextTick(cb, vm)
     }else{
-        if(Object({"VUE_APP_NAME":"shop","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG){
+        if(Object({"NODE_ENV":"development","VUE_APP_NAME":"shop","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG){
             var mpInstance$1 = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance$1.is || mpInstance$1.route) + '][' + vm._uid +
                 ']:nextMPTick');
@@ -8577,7 +8638,7 @@ var patch = function(oldVnode, vnode) {
     });
     var diffData = this.$shouldDiffData === false ? data : diff(data, mpData);
     if (Object.keys(diffData).length) {
-      if (Object({"VUE_APP_NAME":"shop","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
+      if (Object({"NODE_ENV":"development","VUE_APP_NAME":"shop","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG) {
         console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + this._uid +
           ']差量更新',
           JSON.stringify(diffData));
@@ -10264,7 +10325,54 @@ random;exports.default = _default;
 
 /***/ }),
 
-/***/ 303:
+/***/ 31:
+/*!**********************************************************************************************************!*\
+  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/uview-ui/libs/function/trim.js ***!
+  \**********************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;function trim(str) {var pos = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'both';
+  if (pos == 'both') {
+    return str.replace(/^\s+|\s+$/g, "");
+  } else if (pos == "left") {
+    return str.replace(/^\s*/, '');
+  } else if (pos == 'right') {
+    return str.replace(/(\s*$)/g, "");
+  } else if (pos == 'all') {
+    return str.replace(/\s+/g, "");
+  } else {
+    return str;
+  }
+}var _default =
+
+trim;exports.default = _default;
+
+/***/ }),
+
+/***/ 32:
+/*!***********************************************************************************************************!*\
+  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/uview-ui/libs/function/toast.js ***!
+  \***********************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;function toast(title) {var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1500;
+  uni.showToast({
+    title: title,
+    icon: 'none',
+    duration: duration });
+
+}var _default =
+
+toast;exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
+
+/***/ }),
+
+/***/ 326:
 /*!*********************************************************************************************************!*\
   !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/uview-ui/libs/util/emitter.js ***!
   \*********************************************************************************************************/
@@ -10321,53 +10429,6 @@ function _broadcast(componentName, eventName, params) {
     broadcast: function broadcast(componentName, eventName, params) {
       _broadcast.call(this, componentName, eventName, params);
     } } };exports.default = _default;
-
-/***/ }),
-
-/***/ 31:
-/*!**********************************************************************************************************!*\
-  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/uview-ui/libs/function/trim.js ***!
-  \**********************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;function trim(str) {var pos = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'both';
-  if (pos == 'both') {
-    return str.replace(/^\s+|\s+$/g, "");
-  } else if (pos == "left") {
-    return str.replace(/^\s*/, '');
-  } else if (pos == 'right') {
-    return str.replace(/(\s*$)/g, "");
-  } else if (pos == 'all') {
-    return str.replace(/\s+/g, "");
-  } else {
-    return str;
-  }
-}var _default =
-
-trim;exports.default = _default;
-
-/***/ }),
-
-/***/ 32:
-/*!***********************************************************************************************************!*\
-  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/uview-ui/libs/function/toast.js ***!
-  \***********************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;function toast(title) {var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1500;
-  uni.showToast({
-    title: title,
-    icon: 'none',
-    duration: duration });
-
-}var _default =
-
-toast;exports.default = _default;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
 
 /***/ }),
 
@@ -10458,7 +10519,109 @@ function $parent() {var name = arguments.length > 0 && arguments[0] !== undefine
 
 /***/ }),
 
-/***/ 346:
+/***/ 35:
+/*!*********************************************************************************************************!*\
+  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/uview-ui/libs/function/sys.js ***!
+  \*********************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.os = os;exports.sys = sys;function os() {
+  return uni.getSystemInfoSync().platform;
+};
+
+function sys() {
+  return uni.getSystemInfoSync();
+}
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
+
+/***/ }),
+
+/***/ 36:
+/*!**************************************************************************************************************!*\
+  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/uview-ui/libs/function/debounce.js ***!
+  \**************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var timeout = null;
+
+/**
+                                                                                                                         * 防抖原理：一定时间内，只有最后一次操作，再过wait毫秒后才执行函数
+                                                                                                                         * 
+                                                                                                                         * @param {Function} func 要执行的回调函数 
+                                                                                                                         * @param {Number} wait 延时的时间
+                                                                                                                         * @param {Boolean} immediate 是否立即执行 
+                                                                                                                         * @return null
+                                                                                                                         */
+function debounce(func) {var wait = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 500;var immediate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  // 清除定时器
+  if (timeout !== null) clearTimeout(timeout);
+  // 立即执行，此类情况一般用不到
+  if (immediate) {
+    var callNow = !timeout;
+    timeout = setTimeout(function () {
+      timeout = null;
+    }, wait);
+    if (callNow) typeof func === 'function' && func();
+  } else {
+    // 设置定时器，当最后一次操作后，timeout不会再被清除，所以在延时wait毫秒后执行func回调方法
+    timeout = setTimeout(function () {
+      typeof func === 'function' && func();
+    }, wait);
+  }
+}var _default =
+
+debounce;exports.default = _default;
+
+/***/ }),
+
+/***/ 37:
+/*!**************************************************************************************************************!*\
+  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/uview-ui/libs/function/throttle.js ***!
+  \**************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var timer, flag;
+/**
+                                                                                                                      * 节流原理：在一定时间内，只能触发一次
+                                                                                                                      * 
+                                                                                                                      * @param {Function} func 要执行的回调函数 
+                                                                                                                      * @param {Number} wait 延时的时间
+                                                                                                                      * @param {Boolean} immediate 是否立即执行
+                                                                                                                      * @return null
+                                                                                                                      */
+function throttle(func) {var wait = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 500;var immediate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+  if (immediate) {
+    if (!flag) {
+      flag = true;
+      // 如果是立即执行，则在wait毫秒内开始时执行
+      typeof func === 'function' && func();
+      timer = setTimeout(function () {
+        flag = false;
+      }, wait);
+    }
+  } else {
+    if (!flag) {
+      flag = true;
+      // 如果是非立即执行，则在wait毫秒内的结束处执行
+      timer = setTimeout(function () {
+        flag = false;
+        typeof func === 'function' && func();
+      }, wait);
+    }
+
+  }
+};var _default =
+throttle;exports.default = _default;
+
+/***/ }),
+
+/***/ 376:
 /*!****************************************************************************************************************************!*\
   !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/uview-ui/components/u-parse/libs/MpHtmlParser.js ***!
   \****************************************************************************************************************************/
@@ -10472,9 +10635,9 @@ function $parent() {var name = arguments.length > 0 && arguments[0] !== undefine
  * @author JinYufeng
  * @listens MIT
  */
-var cfg = __webpack_require__(/*! ./config.js */ 347),
+var cfg = __webpack_require__(/*! ./config.js */ 377),
 blankChar = cfg.blankChar,
-CssHandler = __webpack_require__(/*! ./CssHandler.js */ 348),
+CssHandler = __webpack_require__(/*! ./CssHandler.js */ 378),
 windowWidth = uni.getSystemInfoSync().windowWidth;
 var emoji;
 
@@ -11049,7 +11212,7 @@ module.exports = MpHtmlParser;
 
 /***/ }),
 
-/***/ 347:
+/***/ 377:
 /*!**********************************************************************************************************************!*\
   !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/uview-ui/components/u-parse/libs/config.js ***!
   \**********************************************************************************************************************/
@@ -11139,14 +11302,14 @@ module.exports = cfg;
 
 /***/ }),
 
-/***/ 348:
+/***/ 378:
 /*!**************************************************************************************************************************!*\
   !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/uview-ui/components/u-parse/libs/CssHandler.js ***!
   \**************************************************************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var cfg = __webpack_require__(/*! ./config.js */ 347),
+var cfg = __webpack_require__(/*! ./config.js */ 377),
 isLetter = function isLetter(c) {return c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z';};
 
 function CssHandler(tagStyle) {
@@ -11249,108 +11412,6 @@ parser.prototype.Content = function () {
 
 /***/ }),
 
-/***/ 35:
-/*!*********************************************************************************************************!*\
-  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/uview-ui/libs/function/sys.js ***!
-  \*********************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.os = os;exports.sys = sys;function os() {
-  return uni.getSystemInfoSync().platform;
-};
-
-function sys() {
-  return uni.getSystemInfoSync();
-}
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
-
-/***/ }),
-
-/***/ 36:
-/*!**************************************************************************************************************!*\
-  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/uview-ui/libs/function/debounce.js ***!
-  \**************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var timeout = null;
-
-/**
-                                                                                                                         * 防抖原理：一定时间内，只有最后一次操作，再过wait毫秒后才执行函数
-                                                                                                                         * 
-                                                                                                                         * @param {Function} func 要执行的回调函数 
-                                                                                                                         * @param {Number} wait 延时的时间
-                                                                                                                         * @param {Boolean} immediate 是否立即执行 
-                                                                                                                         * @return null
-                                                                                                                         */
-function debounce(func) {var wait = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 500;var immediate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-  // 清除定时器
-  if (timeout !== null) clearTimeout(timeout);
-  // 立即执行，此类情况一般用不到
-  if (immediate) {
-    var callNow = !timeout;
-    timeout = setTimeout(function () {
-      timeout = null;
-    }, wait);
-    if (callNow) typeof func === 'function' && func();
-  } else {
-    // 设置定时器，当最后一次操作后，timeout不会再被清除，所以在延时wait毫秒后执行func回调方法
-    timeout = setTimeout(function () {
-      typeof func === 'function' && func();
-    }, wait);
-  }
-}var _default =
-
-debounce;exports.default = _default;
-
-/***/ }),
-
-/***/ 37:
-/*!**************************************************************************************************************!*\
-  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/uview-ui/libs/function/throttle.js ***!
-  \**************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var timer, flag;
-/**
-                                                                                                                      * 节流原理：在一定时间内，只能触发一次
-                                                                                                                      * 
-                                                                                                                      * @param {Function} func 要执行的回调函数 
-                                                                                                                      * @param {Number} wait 延时的时间
-                                                                                                                      * @param {Boolean} immediate 是否立即执行
-                                                                                                                      * @return null
-                                                                                                                      */
-function throttle(func) {var wait = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 500;var immediate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-  if (immediate) {
-    if (!flag) {
-      flag = true;
-      // 如果是立即执行，则在wait毫秒内开始时执行
-      typeof func === 'function' && func();
-      timer = setTimeout(function () {
-        flag = false;
-      }, wait);
-    }
-  } else {
-    if (!flag) {
-      flag = true;
-      // 如果是非立即执行，则在wait毫秒内的结束处执行
-      timer = setTimeout(function () {
-        flag = false;
-        typeof func === 'function' && func();
-      }, wait);
-    }
-
-  }
-};var _default =
-throttle;exports.default = _default;
-
-/***/ }),
-
 /***/ 38:
 /*!**********************************************************************************************************!*\
   !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/uview-ui/libs/config/config.js ***!
@@ -11405,7 +11466,1138 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 
 /***/ }),
 
-/***/ 398:
+/***/ 4:
+/*!*************************************************************************!*\
+  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/pages.json ***!
+  \*************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+
+
+/***/ }),
+
+/***/ 40:
+/*!***************************************************************************!*\
+  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/api/index.js ***!
+  \***************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _axios = _interopRequireDefault(__webpack_require__(/*! axios */ 41));
+var _vue = _interopRequireDefault(__webpack_require__(/*! vue */ 2));
+
+var _url = _interopRequireDefault(__webpack_require__(/*! ./url.js */ 70));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function ownKeys(object, enumerableOnly) {var keys = Object.keys(object);if (Object.getOwnPropertySymbols) {var symbols = Object.getOwnPropertySymbols(object);if (enumerableOnly) symbols = symbols.filter(function (sym) {return Object.getOwnPropertyDescriptor(object, sym).enumerable;});keys.push.apply(keys, symbols);}return keys;}function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};if (i % 2) {ownKeys(Object(source), true).forEach(function (key) {_defineProperty(target, key, source[key]);});} else if (Object.getOwnPropertyDescriptors) {Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));} else {ownKeys(Object(source)).forEach(function (key) {Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));});}}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}
+var vue = new _vue.default();
+var myPost = _axios.default.create({
+  baseURL: _url.default.baseUrl,
+  method: 'post'
+  // timeout: 1000,
+});
+var myGet = _axios.default.create({
+  baseURL: _url.default.baseUrl,
+  method: 'get'
+  // timeout: 1000,
+});
+var myDelete = _axios.default.create({
+  baseURL: _url.default.baseUrl,
+  method: 'delete'
+  // timeout: 1000,
+});
+_axios.default.defaults.adapter = function (config) {//自己定义个适配器，用来适配uniapp的语法
+  return new Promise(function (resolve, reject) {
+    var settle = __webpack_require__(/*! axios/lib/core/settle */ 56);
+    var buildURL = __webpack_require__(/*! axios/lib/helpers/buildURL */ 46);
+    uni.request({
+      method: config.method.toUpperCase(),
+      url: config.baseURL + buildURL(config.url, config.params, config.paramsSerializer),
+      header: config.headers,
+      data: config.data,
+      dataType: config.dataType,
+      responseType: config.responseType,
+      sslVerify: config.sslVerify,
+      complete: function complete(response) {
+        response = {
+          data: response.data,
+          status: response.statusCode,
+          errMsg: response.errMsg,
+          header: response.header,
+          config: config };
+
+
+        settle(resolve, reject, response);
+      } });
+
+  });
+};
+
+myPost.interceptors.request.use(function (config) {
+  // if (sessionStorage.getItem("token")) {
+  // config.headers.token = sessionStorage.token;
+  // config.data = {
+  //     pageNum: 1,
+  //     pageSize: 1,
+  // };
+  // config.headers = {
+  //     // 'token': sessionStorage.token,
+  //     'Access-Control-Allow-Origin': '*',
+  //     "access-control-allow-credentials": "true"
+  // }
+  // }
+  // console.log(config)
+  return config;
+}, function (error) {
+  console.log(error);
+  return Promise.reject();
+});
+myGet.interceptors.request.use(function (config) {
+  // if (sessionStorage.getItem("token")) {
+  // config.headers = {
+  // 	// 'token': sessionStorage.token,
+  // 	'Access-Control-Allow-Origin': '*',
+  // 	"access-control-allow-credentials": "true"
+  // }
+  // config.headers.token = sessionStorage.token;
+  // }
+  return config;
+}, function (error) {
+  console.log(error);
+  return Promise.reject();
+});
+myPost.interceptors.response.use(function (response) {
+  // console.log(response)
+  if (response.status === 200) {
+    return response.data;
+  }
+  // if (response.status === 200 && response.data.code == '200') {
+  //     vue.$message({
+  //         message: response.data.msg,
+  //         type: "success",
+  //     });
+  //     return response.data;
+  // }
+  else {
+      vue.$message.error(response.data.info);
+      Promise.reject();
+    }
+}, function (error) {
+  //错误跳转
+  console.log(error);
+  if (error.response.status === 500) {
+    console.log(vue);
+    if (error.response.data.info != '参数错误') {
+      vue.$message.error(error.response.data.info);
+    }
+  } else if (error.response.status === 401) {
+    sessionStorage.setItem("isLogin", false);
+    console.log(sessionStorage.getItem("isLogin"));
+    // router.push({ path: "/" })
+    // router.go(0)
+    return Promise.reject();
+  } else if (error.response.status === 404) {
+    vue.$alert('页面不存在', '404错误', {
+      confirmButtonText: '确定' });
+
+    return Promise.reject();
+  } else if (error.response.status === 402) {
+    vue.$alert('请求次数限制', '402错误', {
+      confirmButtonText: '确定' });
+
+    return Promise.reject();
+  } else {
+    if (error.response.data.info != '参数错误') {
+      vue.$message.error(error.response.data.info);
+    }
+  }
+});
+myGet.interceptors.response.use(function (response) {
+  if (response.status === 200) {
+    return response.data;
+  }
+  // if (response.status === 200 && response.data.code == '200') {
+  //     vue.$message({
+  //         message: response.data.msg,
+  //         type: "success",
+  //     });
+  //     return response.data;
+  // }
+  else {
+      vue.$message.error(response.data.info);
+      Promise.reject();
+    }
+}, function (error) {
+  //错误跳转
+  console.log(error);
+  if (error.response.status === 500) {
+    if (error.response.data.info != '参数错误') {
+      vue.$message.error(error.response.data.info);
+    }
+  } else if (error.response.status === 401) {
+    sessionStorage.setItem("isLogin", false);
+    console.log(sessionStorage.getItem("isLogin"));
+    // router.push({ path: "/" })
+    // router.go(0)
+    return Promise.reject();
+  } else if (error.response.status === 404) {
+    vue.$alert('页面不存在', '404错误', {
+      confirmButtonText: '确定' });
+
+    return Promise.reject();
+  } else if (error.response.status === 402) {
+    vue.$alert('请求次数限制', '402错误', {
+      confirmButtonText: '确定' });
+
+    return Promise.reject();
+  } else {
+    if (error.response.data.info != '参数错误') {
+      vue.$message.error(error.response.data.info);
+    }
+  }
+});var _default =
+
+{
+  login: function login(obj) {
+    return myPost({
+      url: _url.default.login,
+      params: _objectSpread({},
+      obj)
+
+      // 要在这里写 headers,从sessionStorage中拿,并给headers设置token
+      // headers: {
+      //     'token': sessionStorage.getItem("token")
+      // },
+    });
+  },
+  wx_login: function wx_login(code, rawData, iv, signature, encryptedData) {
+    return myPost({
+      url: _url.default.wx_login,
+      data: {
+        code: code,
+        rawData: rawData,
+        iv: iv,
+        signature: signature,
+        encryptedData: encryptedData } });
+
+
+  },
+  wx_userinfo: function wx_userinfo(openid) {
+    return myPost({
+      url: _url.default.wx_userinfo,
+      data: {
+        openid: openid } });
+
+
+  },
+  wx_index: function wx_index() {
+    return myPost({
+      url: _url.default.wx_index });
+
+  },
+  wx_goodsview: function wx_goodsview(id, openid) {
+    return myPost({
+      url: _url.default.wx_goodsview,
+      data: {
+        id: id } });
+
+
+  },
+  wx_goodslist: function wx_goodslist(obj) {
+    return myPost({
+      url: _url.default.wx_goodslist,
+      data: _objectSpread({},
+      obj) });
+
+
+  },
+  wx_search: function wx_search() {
+    return myPost({
+      url: _url.default.wx_search });
+
+  },
+  wx_cartlist: function wx_cartlist(openid) {
+    return myPost({
+      url: _url.default.wx_cartlist,
+      data: {
+        openid: openid } });
+
+
+  },
+  wx_editcartnum: function wx_editcartnum(openid, cartid, num, cal_type, sign) {
+    return myPost({
+      url: _url.default.wx_editcartnum,
+      data: {
+        openid: openid,
+        cartid: cartid,
+        num: num,
+        cal_type: cal_type,
+        sign: sign } });
+
+
+  },
+  wx_addcart: function wx_addcart(openid, color, size, goods_id, num, sign) {
+    return myPost({
+      url: _url.default.wx_addcart,
+      data: {
+        openid: openid,
+        color: color,
+        size: size,
+        goods_id: goods_id,
+        num: num,
+        sign: sign } });
+
+
+  },
+  wx_cartdel: function wx_cartdel(openid, cartid, sign) {
+    return myPost({
+      url: _url.default.wx_cartdel,
+      data: {
+        openid: openid,
+        cartid: cartid,
+        sign: sign } });
+
+
+  },
+  wx_goodslike: function wx_goodslike(openid) {
+    return myPost({
+      url: _url.default.wx_goodslike,
+      data: {
+        openid: openid } });
+
+
+  },
+  billagreement_view: function billagreement_view() {
+    return myPost({
+      url: _url.default.billagreement_view });
+
+  },
+  wx_userreceiver: function wx_userreceiver(openid) {
+    return myPost({
+      url: _url.default.wx_userreceiver,
+      data: {
+        openid: openid } });
+
+
+  },
+  wx_adduserreceiver: function wx_adduserreceiver(openid, realname, mobile, city, address, is_default, sign) {
+    return myPost({
+      url: _url.default.wx_adduserreceiver,
+      data: {
+        openid: openid,
+        realname: realname,
+        mobile: mobile,
+        city: city,
+        address: address,
+        is_default: is_default,
+        sign: sign } });
+
+
+  },
+  wx_edituserreceiver: function wx_edituserreceiver(openid, id, realname, mobile, city, address, is_default, sign) {
+    return myPost({
+      url: _url.default.wx_edituserreceiver,
+      data: {
+        openid: openid,
+        id: id,
+        realname: realname,
+        mobile: mobile,
+        city: city,
+        address: address,
+        is_default: is_default,
+        sign: sign } });
+
+
+  },
+  wx_deluserreceiver: function wx_deluserreceiver(openid, id, sign) {
+    return myPost({
+      url: _url.default.wx_deluserreceiver,
+      data: {
+        openid: openid,
+        id: id,
+        sign: sign } });
+
+
+  },
+  order_submission: function order_submission(openid, order_type, buy_type, goods_id, color, size, num, sign) {
+    return myPost({
+      url: _url.default.order_submission,
+      data: {
+        openid: openid,
+        order_type: order_type,
+        buy_type: buy_type,
+        goods_id: goods_id,
+        color: color,
+        size: size,
+        num: num,
+        sign: sign } });
+
+
+  },
+  wx_payment: function wx_payment(openid, order_type, buy_type, goods_json, address_id, pay_money, goods_money, totalpostage, pay_type,
+  sign, recommend_userid) {
+    return myPost({
+      url: _url.default.wx_payment,
+      data: {
+        openid: openid,
+        order_type: order_type,
+        buy_type: buy_type,
+        goods_json: goods_json,
+        address_id: address_id,
+        pay_money: pay_money,
+        goods_money: goods_money,
+        totalpostage: totalpostage,
+        pay_type: pay_type,
+        sign: sign,
+        recommend_userid: recommend_userid } });
+
+
+  },
+  wx_userorder: function wx_userorder(openid, is_free, page, pagesize, orders_status) {
+    return myPost({
+      url: _url.default.wx_userorder,
+      data: {
+        openid: openid,
+        is_free: is_free,
+        page: page,
+        pagesize: pagesize,
+        orders_status: orders_status } });
+
+
+  },
+  wx_orderspay: function wx_orderspay(openid, order_id, pay_type, sign) {
+    return myPost({
+      url: _url.default.wx_orderspay,
+      data: {
+        openid: openid,
+        order_id: order_id,
+        pay_type: pay_type,
+        sign: sign } });
+
+
+  },
+  wx_orderscancel: function wx_orderscancel(openid, order_id, sign) {
+    return myPost({
+      url: _url.default.wx_orderscancel,
+      data: {
+        openid: openid,
+        order_id: order_id,
+        sign: sign } });
+
+
+  },
+  wx_orderspostsaleview: function wx_orderspostsaleview(openid, order_id) {
+    return myPost({
+      url: _url.default.wx_orderspostsaleview,
+      data: {
+        openid: openid,
+        order_id: order_id } });
+
+
+  },
+  wx_orderspostsale: function wx_orderspostsale(openid, order_id, postsale_types, postsale_refundmoney, postsale_remark, sign) {
+    return myPost({
+      url: _url.default.wx_orderspostsale,
+      data: {
+        openid: openid,
+        order_id: order_id,
+        postsale_types: postsale_types,
+        postsale_refundmoney: postsale_refundmoney,
+        postsale_remark: postsale_remark,
+        sign: sign } });
+
+
+  },
+  wx_orderspostsalecancel: function wx_orderspostsalecancel(openid, order_id, sign) {
+    return myPost({
+      url: _url.default.wx_orderspostsalecancel,
+      data: {
+        openid: openid,
+        order_id: order_id,
+        sign: sign } });
+
+
+  },
+  wx_orderspostsalesubview: function wx_orderspostsalesubview(openid, order_id) {
+    return myPost({
+      url: _url.default.wx_orderspostsalesubview,
+      data: {
+        openid: openid,
+        order_id: order_id } });
+
+
+  },
+  wx_orderscomment: function wx_orderscomment(openid, order_id, comment, sign) {
+    return myPost({
+      url: _url.default.wx_orderscomment,
+      data: {
+        openid: openid,
+        order_id: order_id,
+        comment: comment,
+        sign: sign } });
+
+
+  },
+  wx_orderconfirmreceipt: function wx_orderconfirmreceipt(openid, order_id, sign) {
+    return myPost({
+      url: _url.default.wx_orderconfirmreceipt,
+      data: {
+        openid: openid,
+        order_id: order_id,
+        sign: sign } });
+
+
+  },
+  wx_goodscomment: function wx_goodscomment(goods_id) {
+    return myPost({
+      url: _url.default.wx_goodscomment,
+      data: {
+        goods_id: goods_id } });
+
+
+  },
+  guide_content: function guide_content() {
+    return myPost({
+      url: _url.default.guide_content });
+
+  },
+  wx_freeordersubmit: function wx_freeordersubmit(openid, sub_orderid) {
+    return myPost({
+      url: _url.default.wx_freeordersubmit,
+      data: {
+        openid: openid,
+        sub_orderid: sub_orderid } });
+
+
+  },
+  wx_freeorder: function wx_freeorder(openid, sub_orderid) {
+    return myPost({
+      url: _url.default.wx_freeorder,
+      data: {
+        openid: openid,
+        sub_orderid: sub_orderid } });
+
+
+  },
+  wx_freeorderrecord: function wx_freeorderrecord(openid, page, pagesize) {
+    return myPost({
+      url: _url.default.wx_freeorderrecord,
+      data: {
+        openid: openid,
+        page: page,
+        pagesize: pagesize } });
+
+
+  },
+  wx_shareqr: function wx_shareqr(openid, goods_id, sign) {
+    return myPost({
+      url: _url.default.wx_shareqr,
+      data: {
+        openid: openid,
+        goods_id: goods_id,
+        sign: sign } });
+
+
+  },
+  wx_usercommission: function wx_usercommission(openid, page, pagesize) {
+    return myPost({
+      url: _url.default.wx_usercommission,
+      data: {
+        openid: openid,
+        page: page,
+        pagesize: pagesize } });
+
+
+  },
+  wx_usercommissionmore: function wx_usercommissionmore(openid, page, pagesize) {
+    return myPost({
+      url: _url.default.wx_usercommissionmore,
+      data: {
+        openid: openid,
+        page: page,
+        pagesize: pagesize } });
+
+
+  },
+  wx_userconsume: function wx_userconsume(openid, page, pagesize) {
+    return myPost({
+      url: _url.default.wx_userconsume,
+      data: {
+        openid: openid,
+        page: page,
+        pagesize: pagesize } });
+
+
+  },
+  wx_addcollect: function wx_addcollect(openid, goods_id, sign) {
+    return myPost({
+      url: _url.default.wx_addcollect,
+      data: {
+        openid: openid,
+        goods_id: goods_id,
+        sign: sign } });
+
+
+  },
+  wx_mycollectdel: function wx_mycollectdel(openid, goods_id, sign) {
+    return myPost({
+      url: _url.default.wx_mycollectdel,
+      data: {
+        openid: openid,
+        goods_id: goods_id,
+        sign: sign } });
+
+
+  },
+  wx_withdrawal: function wx_withdrawal(openid, withdrawal_type, realname, account, bankname, money, sign) {
+    return myPost({
+      url: _url.default.wx_withdrawal,
+      data: {
+        openid: openid,
+        withdrawal_type: withdrawal_type,
+        realname: realname,
+        account: account,
+        bankname: bankname,
+        money: money,
+        sign: sign } });
+
+
+  },
+  wx_mywithdrawal: function wx_mywithdrawal(openid, page, pagesize) {
+    return myPost({
+      url: _url.default.wx_mywithdrawal,
+      data: {
+        openid: openid,
+        page: page,
+        pagesize: pagesize } });
+
+
+  },
+  wx_mycollect: function wx_mycollect(openid, page, pagesize) {
+    return myPost({
+      url: _url.default.wx_mycollect,
+      data: {
+        openid: openid,
+        page: page,
+        pagesize: pagesize } });
+
+
+  },
+  wx_userrecommend: function wx_userrecommend(openid, recommend_userid, sign) {
+    return myPost({
+      url: _url.default.wx_userrecommend,
+      data: {
+        openid: openid,
+        recommend_userid: recommend_userid,
+        sign: sign } });
+
+
+  },
+  wx_usertopcommission: function wx_usertopcommission(openid) {
+    return myPost({
+      url: _url.default.wx_usertopcommission,
+      data: {
+        openid: openid } });
+
+
+  },
+  wx_sharetouserid: function wx_sharetouserid(openid) {
+    return myPost({
+      url: _url.default.wx_sharetouserid,
+      data: {
+        openid: openid } });
+
+
+  },
+  wx_loginuserinfo: function wx_loginuserinfo(obj) {
+    return myPost({
+      url: _url.default.wx_loginuserinfo,
+      data: _objectSpread({},
+      obj) });
+
+
+  },
+  app_wxlogin: function app_wxlogin(obj) {
+    return myPost({
+      url: _url.default.app_wxlogin,
+      data: _objectSpread({},
+      obj) });
+
+
+  },
+  app_upgrade: function app_upgrade(obj) {
+    return myPost({
+      url: _url.default.app_upgrade,
+      data: _objectSpread({},
+      obj) });
+
+
+  } };exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
+
+/***/ }),
+
+/***/ 41:
+/*!******************************************************************************************!*\
+  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/axios/index.js ***!
+  \******************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(/*! ./lib/axios */ 42);
+
+/***/ }),
+
+/***/ 42:
+/*!**********************************************************************************************!*\
+  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/axios/lib/axios.js ***!
+  \**********************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ./utils */ 43);
+var bind = __webpack_require__(/*! ./helpers/bind */ 44);
+var Axios = __webpack_require__(/*! ./core/Axios */ 45);
+var mergeConfig = __webpack_require__(/*! ./core/mergeConfig */ 65);
+var defaults = __webpack_require__(/*! ./defaults */ 51);
+
+/**
+                                       * Create an instance of Axios
+                                       *
+                                       * @param {Object} defaultConfig The default config for the instance
+                                       * @return {Axios} A new instance of Axios
+                                       */
+function createInstance(defaultConfig) {
+  var context = new Axios(defaultConfig);
+  var instance = bind(Axios.prototype.request, context);
+
+  // Copy axios.prototype to instance
+  utils.extend(instance, Axios.prototype, context);
+
+  // Copy context to instance
+  utils.extend(instance, context);
+
+  return instance;
+}
+
+// Create the default instance to be exported
+var axios = createInstance(defaults);
+
+// Expose Axios class to allow class inheritance
+axios.Axios = Axios;
+
+// Factory for creating new instances
+axios.create = function create(instanceConfig) {
+  return createInstance(mergeConfig(axios.defaults, instanceConfig));
+};
+
+// Expose Cancel & CancelToken
+axios.Cancel = __webpack_require__(/*! ./cancel/Cancel */ 66);
+axios.CancelToken = __webpack_require__(/*! ./cancel/CancelToken */ 67);
+axios.isCancel = __webpack_require__(/*! ./cancel/isCancel */ 50);
+
+// Expose all/spread
+axios.all = function all(promises) {
+  return Promise.all(promises);
+};
+axios.spread = __webpack_require__(/*! ./helpers/spread */ 68);
+
+// Expose isAxiosError
+axios.isAxiosError = __webpack_require__(/*! ./helpers/isAxiosError */ 69);
+
+module.exports = axios;
+
+// Allow use of default import syntax in TypeScript
+module.exports.default = axios;
+
+/***/ }),
+
+/***/ 43:
+/*!**********************************************************************************************!*\
+  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/axios/lib/utils.js ***!
+  \**********************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var bind = __webpack_require__(/*! ./helpers/bind */ 44);
+
+/*global toString:true*/
+
+// utils is a library of generic helper functions non-specific to axios
+
+var toString = Object.prototype.toString;
+
+/**
+                                           * Determine if a value is an Array
+                                           *
+                                           * @param {Object} val The value to test
+                                           * @returns {boolean} True if value is an Array, otherwise false
+                                           */
+function isArray(val) {
+  return toString.call(val) === '[object Array]';
+}
+
+/**
+   * Determine if a value is undefined
+   *
+   * @param {Object} val The value to test
+   * @returns {boolean} True if the value is undefined, otherwise false
+   */
+function isUndefined(val) {
+  return typeof val === 'undefined';
+}
+
+/**
+   * Determine if a value is a Buffer
+   *
+   * @param {Object} val The value to test
+   * @returns {boolean} True if value is a Buffer, otherwise false
+   */
+function isBuffer(val) {
+  return val !== null && !isUndefined(val) && val.constructor !== null && !isUndefined(val.constructor) &&
+  typeof val.constructor.isBuffer === 'function' && val.constructor.isBuffer(val);
+}
+
+/**
+   * Determine if a value is an ArrayBuffer
+   *
+   * @param {Object} val The value to test
+   * @returns {boolean} True if value is an ArrayBuffer, otherwise false
+   */
+function isArrayBuffer(val) {
+  return toString.call(val) === '[object ArrayBuffer]';
+}
+
+/**
+   * Determine if a value is a FormData
+   *
+   * @param {Object} val The value to test
+   * @returns {boolean} True if value is an FormData, otherwise false
+   */
+function isFormData(val) {
+  return typeof FormData !== 'undefined' && val instanceof FormData;
+}
+
+/**
+   * Determine if a value is a view on an ArrayBuffer
+   *
+   * @param {Object} val The value to test
+   * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
+   */
+function isArrayBufferView(val) {
+  var result;
+  if (typeof ArrayBuffer !== 'undefined' && ArrayBuffer.isView) {
+    result = ArrayBuffer.isView(val);
+  } else {
+    result = val && val.buffer && val.buffer instanceof ArrayBuffer;
+  }
+  return result;
+}
+
+/**
+   * Determine if a value is a String
+   *
+   * @param {Object} val The value to test
+   * @returns {boolean} True if value is a String, otherwise false
+   */
+function isString(val) {
+  return typeof val === 'string';
+}
+
+/**
+   * Determine if a value is a Number
+   *
+   * @param {Object} val The value to test
+   * @returns {boolean} True if value is a Number, otherwise false
+   */
+function isNumber(val) {
+  return typeof val === 'number';
+}
+
+/**
+   * Determine if a value is an Object
+   *
+   * @param {Object} val The value to test
+   * @returns {boolean} True if value is an Object, otherwise false
+   */
+function isObject(val) {
+  return val !== null && typeof val === 'object';
+}
+
+/**
+   * Determine if a value is a plain Object
+   *
+   * @param {Object} val The value to test
+   * @return {boolean} True if value is a plain Object, otherwise false
+   */
+function isPlainObject(val) {
+  if (toString.call(val) !== '[object Object]') {
+    return false;
+  }
+
+  var prototype = Object.getPrototypeOf(val);
+  return prototype === null || prototype === Object.prototype;
+}
+
+/**
+   * Determine if a value is a Date
+   *
+   * @param {Object} val The value to test
+   * @returns {boolean} True if value is a Date, otherwise false
+   */
+function isDate(val) {
+  return toString.call(val) === '[object Date]';
+}
+
+/**
+   * Determine if a value is a File
+   *
+   * @param {Object} val The value to test
+   * @returns {boolean} True if value is a File, otherwise false
+   */
+function isFile(val) {
+  return toString.call(val) === '[object File]';
+}
+
+/**
+   * Determine if a value is a Blob
+   *
+   * @param {Object} val The value to test
+   * @returns {boolean} True if value is a Blob, otherwise false
+   */
+function isBlob(val) {
+  return toString.call(val) === '[object Blob]';
+}
+
+/**
+   * Determine if a value is a Function
+   *
+   * @param {Object} val The value to test
+   * @returns {boolean} True if value is a Function, otherwise false
+   */
+function isFunction(val) {
+  return toString.call(val) === '[object Function]';
+}
+
+/**
+   * Determine if a value is a Stream
+   *
+   * @param {Object} val The value to test
+   * @returns {boolean} True if value is a Stream, otherwise false
+   */
+function isStream(val) {
+  return isObject(val) && isFunction(val.pipe);
+}
+
+/**
+   * Determine if a value is a URLSearchParams object
+   *
+   * @param {Object} val The value to test
+   * @returns {boolean} True if value is a URLSearchParams object, otherwise false
+   */
+function isURLSearchParams(val) {
+  return typeof URLSearchParams !== 'undefined' && val instanceof URLSearchParams;
+}
+
+/**
+   * Trim excess whitespace off the beginning and end of a string
+   *
+   * @param {String} str The String to trim
+   * @returns {String} The String freed of excess whitespace
+   */
+function trim(str) {
+  return str.replace(/^\s*/, '').replace(/\s*$/, '');
+}
+
+/**
+   * Determine if we're running in a standard browser environment
+   *
+   * This allows axios to run in a web worker, and react-native.
+   * Both environments support XMLHttpRequest, but not fully standard globals.
+   *
+   * web workers:
+   *  typeof window -> undefined
+   *  typeof document -> undefined
+   *
+   * react-native:
+   *  navigator.product -> 'ReactNative'
+   * nativescript
+   *  navigator.product -> 'NativeScript' or 'NS'
+   */
+function isStandardBrowserEnv() {
+  if (typeof navigator !== 'undefined' && (navigator.product === 'ReactNative' ||
+  navigator.product === 'NativeScript' ||
+  navigator.product === 'NS')) {
+    return false;
+  }
+  return (
+    typeof window !== 'undefined' &&
+    typeof document !== 'undefined');
+
+}
+
+/**
+   * Iterate over an Array or an Object invoking a function for each item.
+   *
+   * If `obj` is an Array callback will be called passing
+   * the value, index, and complete array for each item.
+   *
+   * If 'obj' is an Object callback will be called passing
+   * the value, key, and complete object for each property.
+   *
+   * @param {Object|Array} obj The object to iterate
+   * @param {Function} fn The callback to invoke for each item
+   */
+function forEach(obj, fn) {
+  // Don't bother if no value provided
+  if (obj === null || typeof obj === 'undefined') {
+    return;
+  }
+
+  // Force an array if not already something iterable
+  if (typeof obj !== 'object') {
+    /*eslint no-param-reassign:0*/
+    obj = [obj];
+  }
+
+  if (isArray(obj)) {
+    // Iterate over array values
+    for (var i = 0, l = obj.length; i < l; i++) {
+      fn.call(null, obj[i], i, obj);
+    }
+  } else {
+    // Iterate over object keys
+    for (var key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        fn.call(null, obj[key], key, obj);
+      }
+    }
+  }
+}
+
+/**
+   * Accepts varargs expecting each argument to be an object, then
+   * immutably merges the properties of each object and returns result.
+   *
+   * When multiple objects contain the same key the later object in
+   * the arguments list will take precedence.
+   *
+   * Example:
+   *
+   * ```js
+   * var result = merge({foo: 123}, {foo: 456});
+   * console.log(result.foo); // outputs 456
+   * ```
+   *
+   * @param {Object} obj1 Object to merge
+   * @returns {Object} Result of all merge properties
+   */
+function merge() /* obj1, obj2, obj3, ... */{
+  var result = {};
+  function assignValue(val, key) {
+    if (isPlainObject(result[key]) && isPlainObject(val)) {
+      result[key] = merge(result[key], val);
+    } else if (isPlainObject(val)) {
+      result[key] = merge({}, val);
+    } else if (isArray(val)) {
+      result[key] = val.slice();
+    } else {
+      result[key] = val;
+    }
+  }
+
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    forEach(arguments[i], assignValue);
+  }
+  return result;
+}
+
+/**
+   * Extends object a by mutably adding to it the properties of object b.
+   *
+   * @param {Object} a The object to be extended
+   * @param {Object} b The object to copy properties from
+   * @param {Object} thisArg The object to bind function to
+   * @return {Object} The resulting value of object a
+   */
+function extend(a, b, thisArg) {
+  forEach(b, function assignValue(val, key) {
+    if (thisArg && typeof val === 'function') {
+      a[key] = bind(val, thisArg);
+    } else {
+      a[key] = val;
+    }
+  });
+  return a;
+}
+
+/**
+   * Remove byte order marker. This catches EF BB BF (the UTF-8 BOM)
+   *
+   * @param {string} content with BOM
+   * @return {string} content value without BOM
+   */
+function stripBOM(content) {
+  if (content.charCodeAt(0) === 0xFEFF) {
+    content = content.slice(1);
+  }
+  return content;
+}
+
+module.exports = {
+  isArray: isArray,
+  isArrayBuffer: isArrayBuffer,
+  isBuffer: isBuffer,
+  isFormData: isFormData,
+  isArrayBufferView: isArrayBufferView,
+  isString: isString,
+  isNumber: isNumber,
+  isObject: isObject,
+  isPlainObject: isPlainObject,
+  isUndefined: isUndefined,
+  isDate: isDate,
+  isFile: isFile,
+  isBlob: isBlob,
+  isFunction: isFunction,
+  isStream: isStream,
+  isURLSearchParams: isURLSearchParams,
+  isStandardBrowserEnv: isStandardBrowserEnv,
+  forEach: forEach,
+  merge: merge,
+  extend: extend,
+  trim: trim,
+  stripBOM: stripBOM };
+
+/***/ }),
+
+/***/ 44:
+/*!*****************************************************************************************************!*\
+  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/axios/lib/helpers/bind.js ***!
+  \*****************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = function bind(fn, thisArg) {
+  return function wrap() {
+    var args = new Array(arguments.length);
+    for (var i = 0; i < args.length; i++) {
+      args[i] = arguments[i];
+    }
+    return fn.apply(thisArg, args);
+  };
+};
+
+/***/ }),
+
+/***/ 442:
 /*!*****************************************************************************************************************!*\
   !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/uview-ui/libs/util/async-validator.js ***!
   \*****************************************************************************************************************/
@@ -11435,7 +12627,7 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 var formatRegExp = /%[sdj%]/g;
 var warning = function warning() {}; // don't print warning message when in production env or node runtime
 
-if (typeof process !== 'undefined' && Object({"VUE_APP_NAME":"shop","VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}) && "development" !== 'production' && typeof window !==
+if (typeof process !== 'undefined' && Object({"NODE_ENV":"development","VUE_APP_NAME":"shop","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}) && "development" !== 'production' && typeof window !==
 'undefined' && typeof document !== 'undefined') {
   warning = function warning(type, errors) {
     if (typeof console !== 'undefined' && console.warn) {
@@ -12772,1206 +13964,6 @@ Schema;exports.default = _default;
 
 /***/ }),
 
-/***/ 4:
-/*!*************************************************************************!*\
-  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/pages.json ***!
-  \*************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-
-
-/***/ }),
-
-/***/ 40:
-/*!***************************************************************************!*\
-  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/api/index.js ***!
-  \***************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _axios = _interopRequireDefault(__webpack_require__(/*! axios */ 41));
-var _vue = _interopRequireDefault(__webpack_require__(/*! vue */ 2));
-
-var _url = _interopRequireDefault(__webpack_require__(/*! ./url.js */ 70));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function ownKeys(object, enumerableOnly) {var keys = Object.keys(object);if (Object.getOwnPropertySymbols) {var symbols = Object.getOwnPropertySymbols(object);if (enumerableOnly) symbols = symbols.filter(function (sym) {return Object.getOwnPropertyDescriptor(object, sym).enumerable;});keys.push.apply(keys, symbols);}return keys;}function _objectSpread(target) {for (var i = 1; i < arguments.length; i++) {var source = arguments[i] != null ? arguments[i] : {};if (i % 2) {ownKeys(Object(source), true).forEach(function (key) {_defineProperty(target, key, source[key]);});} else if (Object.getOwnPropertyDescriptors) {Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));} else {ownKeys(Object(source)).forEach(function (key) {Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));});}}return target;}function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}
-var vue = new _vue.default();
-var myPost = _axios.default.create({
-  baseURL: _url.default.baseUrl,
-  method: 'post'
-  // timeout: 1000,
-});
-var myGet = _axios.default.create({
-  baseURL: _url.default.baseUrl,
-  method: 'get'
-  // timeout: 1000,
-});
-var myDelete = _axios.default.create({
-  baseURL: _url.default.baseUrl,
-  method: 'delete'
-  // timeout: 1000,
-});
-_axios.default.defaults.adapter = function (config) {//自己定义个适配器，用来适配uniapp的语法
-  return new Promise(function (resolve, reject) {
-    var settle = __webpack_require__(/*! axios/lib/core/settle */ 56);
-    var buildURL = __webpack_require__(/*! axios/lib/helpers/buildURL */ 46);
-    uni.request({
-      method: config.method.toUpperCase(),
-      url: config.baseURL + buildURL(config.url, config.params, config.paramsSerializer),
-      header: config.headers,
-      data: config.data,
-      dataType: config.dataType,
-      responseType: config.responseType,
-      sslVerify: config.sslVerify,
-      complete: function complete(response) {
-        response = {
-          data: response.data,
-          status: response.statusCode,
-          errMsg: response.errMsg,
-          header: response.header,
-          config: config };
-
-
-        settle(resolve, reject, response);
-      } });
-
-  });
-};
-
-myPost.interceptors.request.use(function (config) {
-  // if (sessionStorage.getItem("token")) {
-  // config.headers.token = sessionStorage.token;
-  // config.data = {
-  //     pageNum: 1,
-  //     pageSize: 1,
-  // };
-  // config.headers = {
-  //     // 'token': sessionStorage.token,
-  //     'Access-Control-Allow-Origin': '*',
-  //     "access-control-allow-credentials": "true"
-  // }
-  // }
-  // console.log(config)
-  return config;
-}, function (error) {
-  console.log(error);
-  return Promise.reject();
-});
-myGet.interceptors.request.use(function (config) {
-  // if (sessionStorage.getItem("token")) {
-  // config.headers = {
-  // 	// 'token': sessionStorage.token,
-  // 	'Access-Control-Allow-Origin': '*',
-  // 	"access-control-allow-credentials": "true"
-  // }
-  // config.headers.token = sessionStorage.token;
-  // }
-  return config;
-}, function (error) {
-  console.log(error);
-  return Promise.reject();
-});
-myPost.interceptors.response.use(function (response) {
-  // console.log(response)
-  if (response.status === 200) {
-    return response.data;
-  }
-  // if (response.status === 200 && response.data.code == '200') {
-  //     vue.$message({
-  //         message: response.data.msg,
-  //         type: "success",
-  //     });
-  //     return response.data;
-  // }
-  else {
-      vue.$message.error(response.data.info);
-      Promise.reject();
-    }
-}, function (error) {
-  //错误跳转
-  console.log(error);
-  if (error.response.status === 500) {
-    console.log(vue);
-    if (error.response.data.info != '参数错误') {
-      vue.$message.error(error.response.data.info);
-    }
-  } else if (error.response.status === 401) {
-    sessionStorage.setItem("isLogin", false);
-    console.log(sessionStorage.getItem("isLogin"));
-    // router.push({ path: "/" })
-    // router.go(0)
-    return Promise.reject();
-  } else if (error.response.status === 404) {
-    vue.$alert('页面不存在', '404错误', {
-      confirmButtonText: '确定' });
-
-    return Promise.reject();
-  } else if (error.response.status === 402) {
-    vue.$alert('请求次数限制', '402错误', {
-      confirmButtonText: '确定' });
-
-    return Promise.reject();
-  } else {
-    if (error.response.data.info != '参数错误') {
-      vue.$message.error(error.response.data.info);
-    }
-  }
-});
-myGet.interceptors.response.use(function (response) {
-  if (response.status === 200) {
-    return response.data;
-  }
-  // if (response.status === 200 && response.data.code == '200') {
-  //     vue.$message({
-  //         message: response.data.msg,
-  //         type: "success",
-  //     });
-  //     return response.data;
-  // }
-  else {
-      vue.$message.error(response.data.info);
-      Promise.reject();
-    }
-}, function (error) {
-  //错误跳转
-  console.log(error);
-  if (error.response.status === 500) {
-    if (error.response.data.info != '参数错误') {
-      vue.$message.error(error.response.data.info);
-    }
-  } else if (error.response.status === 401) {
-    sessionStorage.setItem("isLogin", false);
-    console.log(sessionStorage.getItem("isLogin"));
-    // router.push({ path: "/" })
-    // router.go(0)
-    return Promise.reject();
-  } else if (error.response.status === 404) {
-    vue.$alert('页面不存在', '404错误', {
-      confirmButtonText: '确定' });
-
-    return Promise.reject();
-  } else if (error.response.status === 402) {
-    vue.$alert('请求次数限制', '402错误', {
-      confirmButtonText: '确定' });
-
-    return Promise.reject();
-  } else {
-    if (error.response.data.info != '参数错误') {
-      vue.$message.error(error.response.data.info);
-    }
-  }
-});var _default =
-
-{
-  login: function login(obj) {
-    return myPost({
-      url: _url.default.login,
-      params: _objectSpread({},
-      obj)
-
-      // 要在这里写 headers,从sessionStorage中拿,并给headers设置token
-      // headers: {
-      //     'token': sessionStorage.getItem("token")
-      // },
-    });
-  },
-  wx_login: function wx_login(code, rawData, iv, signature, encryptedData) {
-    return myPost({
-      url: _url.default.wx_login,
-      data: {
-        code: code,
-        rawData: rawData,
-        iv: iv,
-        signature: signature,
-        encryptedData: encryptedData } });
-
-
-  },
-  wx_userinfo: function wx_userinfo(openid) {
-    return myPost({
-      url: _url.default.wx_userinfo,
-      data: {
-        openid: openid } });
-
-
-  },
-  wx_index: function wx_index() {
-    return myPost({
-      url: _url.default.wx_index });
-
-  },
-  wx_goodsview: function wx_goodsview(id, openid) {
-    return myPost({
-      url: _url.default.wx_goodsview,
-      data: {
-        id: id,
-        openid: openid } });
-
-
-  },
-  wx_goodslist: function wx_goodslist(obj) {
-    return myPost({
-      url: _url.default.wx_goodslist,
-      data: _objectSpread({},
-      obj) });
-
-
-  },
-  wx_search: function wx_search() {
-    return myPost({
-      url: _url.default.wx_search });
-
-  },
-  wx_cartlist: function wx_cartlist(openid) {
-    return myPost({
-      url: _url.default.wx_cartlist,
-      data: {
-        openid: openid } });
-
-
-  },
-  wx_editcartnum: function wx_editcartnum(openid, cartid, num, cal_type, sign) {
-    return myPost({
-      url: _url.default.wx_editcartnum,
-      data: {
-        openid: openid,
-        cartid: cartid,
-        num: num,
-        cal_type: cal_type,
-        sign: sign } });
-
-
-  },
-  wx_addcart: function wx_addcart(openid, color, size, goods_id, num, sign) {
-    return myPost({
-      url: _url.default.wx_addcart,
-      data: {
-        openid: openid,
-        color: color,
-        size: size,
-        goods_id: goods_id,
-        num: num,
-        sign: sign } });
-
-
-  },
-  wx_cartdel: function wx_cartdel(openid, cartid, sign) {
-    return myPost({
-      url: _url.default.wx_cartdel,
-      data: {
-        openid: openid,
-        cartid: cartid,
-        sign: sign } });
-
-
-  },
-  wx_goodslike: function wx_goodslike(openid) {
-    return myPost({
-      url: _url.default.wx_goodslike,
-      data: {
-        openid: openid } });
-
-
-  },
-  billagreement_view: function billagreement_view() {
-    return myPost({
-      url: _url.default.billagreement_view });
-
-  },
-  wx_userreceiver: function wx_userreceiver(openid) {
-    return myPost({
-      url: _url.default.wx_userreceiver,
-      data: {
-        openid: openid } });
-
-
-  },
-  wx_adduserreceiver: function wx_adduserreceiver(openid, realname, mobile, city, address, is_default, sign) {
-    return myPost({
-      url: _url.default.wx_adduserreceiver,
-      data: {
-        openid: openid,
-        realname: realname,
-        mobile: mobile,
-        city: city,
-        address: address,
-        is_default: is_default,
-        sign: sign } });
-
-
-  },
-  wx_edituserreceiver: function wx_edituserreceiver(openid, id, realname, mobile, city, address, is_default, sign) {
-    return myPost({
-      url: _url.default.wx_edituserreceiver,
-      data: {
-        openid: openid,
-        id: id,
-        realname: realname,
-        mobile: mobile,
-        city: city,
-        address: address,
-        is_default: is_default,
-        sign: sign } });
-
-
-  },
-  wx_deluserreceiver: function wx_deluserreceiver(openid, id, sign) {
-    return myPost({
-      url: _url.default.wx_deluserreceiver,
-      data: {
-        openid: openid,
-        id: id,
-        sign: sign } });
-
-
-  },
-  order_submission: function order_submission(openid, order_type, buy_type, goods_id, color, size, num, sign) {
-    return myPost({
-      url: _url.default.order_submission,
-      data: {
-        openid: openid,
-        order_type: order_type,
-        buy_type: buy_type,
-        goods_id: goods_id,
-        color: color,
-        size: size,
-        num: num,
-        sign: sign } });
-
-
-  },
-  wx_payment: function wx_payment(openid, order_type, buy_type, goods_json, address_id, pay_money, goods_money, totalpostage, pay_type,
-  sign, recommend_userid) {
-    return myPost({
-      url: _url.default.wx_payment,
-      data: {
-        openid: openid,
-        order_type: order_type,
-        buy_type: buy_type,
-        goods_json: goods_json,
-        address_id: address_id,
-        pay_money: pay_money,
-        goods_money: goods_money,
-        totalpostage: totalpostage,
-        pay_type: pay_type,
-        sign: sign,
-        recommend_userid: recommend_userid } });
-
-
-  },
-  wx_userorder: function wx_userorder(openid, is_free, page, pagesize, orders_status) {
-    return myPost({
-      url: _url.default.wx_userorder,
-      data: {
-        openid: openid,
-        is_free: is_free,
-        page: page,
-        pagesize: pagesize,
-        orders_status: orders_status } });
-
-
-  },
-  wx_orderspay: function wx_orderspay(openid, order_id, pay_type, sign) {
-    return myPost({
-      url: _url.default.wx_orderspay,
-      data: {
-        openid: openid,
-        order_id: order_id,
-        pay_type: pay_type,
-        sign: sign } });
-
-
-  },
-  wx_orderscancel: function wx_orderscancel(openid, order_id, sign) {
-    return myPost({
-      url: _url.default.wx_orderscancel,
-      data: {
-        openid: openid,
-        order_id: order_id,
-        sign: sign } });
-
-
-  },
-  wx_orderspostsaleview: function wx_orderspostsaleview(openid, order_id) {
-    return myPost({
-      url: _url.default.wx_orderspostsaleview,
-      data: {
-        openid: openid,
-        order_id: order_id } });
-
-
-  },
-  wx_orderspostsale: function wx_orderspostsale(openid, order_id, postsale_types, postsale_refundmoney, postsale_remark, sign) {
-    return myPost({
-      url: _url.default.wx_orderspostsale,
-      data: {
-        openid: openid,
-        order_id: order_id,
-        postsale_types: postsale_types,
-        postsale_refundmoney: postsale_refundmoney,
-        postsale_remark: postsale_remark,
-        sign: sign } });
-
-
-  },
-  wx_orderspostsalecancel: function wx_orderspostsalecancel(openid, order_id, sign) {
-    return myPost({
-      url: _url.default.wx_orderspostsalecancel,
-      data: {
-        openid: openid,
-        order_id: order_id,
-        sign: sign } });
-
-
-  },
-  wx_orderspostsalesubview: function wx_orderspostsalesubview(openid, order_id) {
-    return myPost({
-      url: _url.default.wx_orderspostsalesubview,
-      data: {
-        openid: openid,
-        order_id: order_id } });
-
-
-  },
-  wx_orderscomment: function wx_orderscomment(openid, order_id, comment, sign) {
-    return myPost({
-      url: _url.default.wx_orderscomment,
-      data: {
-        openid: openid,
-        order_id: order_id,
-        comment: comment,
-        sign: sign } });
-
-
-  },
-  wx_orderconfirmreceipt: function wx_orderconfirmreceipt(openid, order_id, sign) {
-    return myPost({
-      url: _url.default.wx_orderconfirmreceipt,
-      data: {
-        openid: openid,
-        order_id: order_id,
-        sign: sign } });
-
-
-  },
-  wx_goodscomment: function wx_goodscomment(goods_id) {
-    return myPost({
-      url: _url.default.wx_goodscomment,
-      data: {
-        goods_id: goods_id } });
-
-
-  },
-  guide_content: function guide_content() {
-    return myPost({
-      url: _url.default.guide_content });
-
-  },
-  wx_freeordersubmit: function wx_freeordersubmit(openid, sub_orderid) {
-    return myPost({
-      url: _url.default.wx_freeordersubmit,
-      data: {
-        openid: openid,
-        sub_orderid: sub_orderid } });
-
-
-  },
-  wx_freeorder: function wx_freeorder(openid, sub_orderid) {
-    return myPost({
-      url: _url.default.wx_freeorder,
-      data: {
-        openid: openid,
-        sub_orderid: sub_orderid } });
-
-
-  },
-  wx_freeorderrecord: function wx_freeorderrecord(openid, page, pagesize) {
-    return myPost({
-      url: _url.default.wx_freeorderrecord,
-      data: {
-        openid: openid,
-        page: page,
-        pagesize: pagesize } });
-
-
-  },
-  wx_shareqr: function wx_shareqr(openid, goods_id, sign) {
-    return myPost({
-      url: _url.default.wx_shareqr,
-      data: {
-        openid: openid,
-        goods_id: goods_id,
-        sign: sign } });
-
-
-  },
-  wx_usercommission: function wx_usercommission(openid, page, pagesize) {
-    return myPost({
-      url: _url.default.wx_usercommission,
-      data: {
-        openid: openid,
-        page: page,
-        pagesize: pagesize } });
-
-
-  },
-  wx_usercommissionmore: function wx_usercommissionmore(openid, page, pagesize) {
-    return myPost({
-      url: _url.default.wx_usercommissionmore,
-      data: {
-        openid: openid,
-        page: page,
-        pagesize: pagesize } });
-
-
-  },
-  wx_userconsume: function wx_userconsume(openid, page, pagesize) {
-    return myPost({
-      url: _url.default.wx_userconsume,
-      data: {
-        openid: openid,
-        page: page,
-        pagesize: pagesize } });
-
-
-  },
-  wx_addcollect: function wx_addcollect(openid, goods_id, sign) {
-    return myPost({
-      url: _url.default.wx_addcollect,
-      data: {
-        openid: openid,
-        goods_id: goods_id,
-        sign: sign } });
-
-
-  },
-  wx_mycollectdel: function wx_mycollectdel(openid, goods_id, sign) {
-    return myPost({
-      url: _url.default.wx_mycollectdel,
-      data: {
-        openid: openid,
-        goods_id: goods_id,
-        sign: sign } });
-
-
-  },
-  wx_withdrawal: function wx_withdrawal(openid, withdrawal_type, realname, account, bankname, money, sign) {
-    return myPost({
-      url: _url.default.wx_withdrawal,
-      data: {
-        openid: openid,
-        withdrawal_type: withdrawal_type,
-        realname: realname,
-        account: account,
-        bankname: bankname,
-        money: money,
-        sign: sign } });
-
-
-  },
-  wx_mywithdrawal: function wx_mywithdrawal(openid, page, pagesize) {
-    return myPost({
-      url: _url.default.wx_mywithdrawal,
-      data: {
-        openid: openid,
-        page: page,
-        pagesize: pagesize } });
-
-
-  },
-  wx_mycollect: function wx_mycollect(openid, page, pagesize) {
-    return myPost({
-      url: _url.default.wx_mycollect,
-      data: {
-        openid: openid,
-        page: page,
-        pagesize: pagesize } });
-
-
-  } };exports.default = _default;
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
-
-/***/ }),
-
-/***/ 41:
-/*!******************************************************************************************!*\
-  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/axios/index.js ***!
-  \******************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(/*! ./lib/axios */ 42);
-
-/***/ }),
-
-/***/ 413:
-/*!*********************************************************************************************!*\
-  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/components/evan-icons/icons.js ***!
-  \*********************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = { "glass": "\uF000", "music": "\uF001", "search": "\uF002", "envelope-o": "\uF003", "heart": "\uF004", "star": "\uF005", "star-o": "\uF006", "user": "\uF007", "film": "\uF008", "th-large": "\uF009", "th": "\uF00A", "th-list": "\uF00B", "check": "\uF00C", "remove": "\uF00D", "close": "\uF00D", "times": "\uF00D", "search-plus": "\uF00E", "search-minus": "\uF010", "power-off": "\uF011", "signal": "\uF012", "gear": "\uF013", "cog": "\uF013", "trash-o": "\uF014", "home": "\uF015", "file-o": "\uF016", "clock-o": "\uF017", "road": "\uF018", "download": "\uF019", "arrow-circle-o-down": "\uF01A", "arrow-circle-o-up": "\uF01B", "inbox": "\uF01C", "play-circle-o": "\uF01D", "rotate-right": "\uF01E", "repeat": "\uF01E", "refresh": "\uF021", "list-alt": "\uF022", "lock": "\uF023", "flag": "\uF024", "headphones": "\uF025", "volume-off": "\uF026", "volume-down": "\uF027", "volume-up": "\uF028", "qrcode": "\uF029", "barcode": "\uF02A", "tag": "\uF02B", "tags": "\uF02C", "book": "\uF02D", "bookmark": "\uF02E", "print": "\uF02F", "camera": "\uF030", "font": "\uF031", "bold": "\uF032", "italic": "\uF033", "text-height": "\uF034", "text-width": "\uF035", "align-left": "\uF036", "align-center": "\uF037", "align-right": "\uF038", "align-justify": "\uF039", "list": "\uF03A", "dedent": "\uF03B", "outdent": "\uF03B", "indent": "\uF03C", "video-camera": "\uF03D", "photo": "\uF03E", "image": "\uF03E", "picture-o": "\uF03E", "pencil": "\uF040", "map-marker": "\uF041", "adjust": "\uF042", "tint": "\uF043", "edit": "\uF044", "pencil-square-o": "\uF044", "share-square-o": "\uF045", "check-square-o": "\uF046", "arrows": "\uF047", "step-backward": "\uF048", "fast-backward": "\uF049", "backward": "\uF04A", "play": "\uF04B", "pause": "\uF04C", "stop": "\uF04D", "forward": "\uF04E", "fast-forward": "\uF050", "step-forward": "\uF051", "eject": "\uF052", "chevron-left": "\uF053", "chevron-right": "\uF054", "plus-circle": "\uF055", "minus-circle": "\uF056", "times-circle": "\uF057", "check-circle": "\uF058", "question-circle": "\uF059", "info-circle": "\uF05A", "crosshairs": "\uF05B", "times-circle-o": "\uF05C", "check-circle-o": "\uF05D", "ban": "\uF05E", "arrow-left": "\uF060", "arrow-right": "\uF061", "arrow-up": "\uF062", "arrow-down": "\uF063", "mail-forward": "\uF064", "share": "\uF064", "expand": "\uF065", "compress": "\uF066", "plus": "\uF067", "minus": "\uF068", "asterisk": "\uF069", "exclamation-circle": "\uF06A", "gift": "\uF06B", "leaf": "\uF06C", "fire": "\uF06D", "eye": "\uF06E", "eye-slash": "\uF070", "warning": "\uF071", "exclamation-triangle": "\uF071", "plane": "\uF072", "calendar": "\uF073", "random": "\uF074", "comment": "\uF075", "magnet": "\uF076", "chevron-up": "\uF077", "chevron-down": "\uF078", "retweet": "\uF079", "shopping-cart": "\uF07A", "folder": "\uF07B", "folder-open": "\uF07C", "arrows-v": "\uF07D", "arrows-h": "\uF07E", "bar-chart-o": "\uF080", "bar-chart": "\uF080", "twitter-square": "\uF081", "facebook-square": "\uF082", "camera-retro": "\uF083", "key": "\uF084", "gears": "\uF085", "cogs": "\uF085", "comments": "\uF086", "thumbs-o-up": "\uF087", "thumbs-o-down": "\uF088", "star-half": "\uF089", "heart-o": "\uF08A", "sign-out": "\uF08B", "linkedin-square": "\uF08C", "thumb-tack": "\uF08D", "external-link": "\uF08E", "sign-in": "\uF090", "trophy": "\uF091", "github-square": "\uF092", "upload": "\uF093", "lemon-o": "\uF094", "phone": "\uF095", "square-o": "\uF096", "bookmark-o": "\uF097", "phone-square": "\uF098", "twitter": "\uF099", "facebook-f": "\uF09A", "facebook": "\uF09A", "github": "\uF09B", "unlock": "\uF09C", "credit-card": "\uF09D", "feed": "\uF09E", "rss": "\uF09E", "hdd-o": "\uF0A0", "bullhorn": "\uF0A1", "bell-o": "\uF0A2", "certificate": "\uF0A3", "hand-o-right": "\uF0A4", "hand-o-left": "\uF0A5", "hand-o-up": "\uF0A6", "hand-o-down": "\uF0A7", "arrow-circle-left": "\uF0A8", "arrow-circle-right": "\uF0A9", "arrow-circle-up": "\uF0AA", "arrow-circle-down": "\uF0AB", "globe": "\uF0AC", "wrench": "\uF0AD", "tasks": "\uF0AE", "filter": "\uF0B0", "briefcase": "\uF0B1", "arrows-alt": "\uF0B2", "group": "\uF0C0", "users": "\uF0C0", "chain": "\uF0C1", "link": "\uF0C1", "cloud": "\uF0C2", "flask": "\uF0C3", "cut": "\uF0C4", "scissors": "\uF0C4", "copy": "\uF0C5", "files-o": "\uF0C5", "paperclip": "\uF0C6", "save": "\uF0C7", "floppy-o": "\uF0C7", "square": "\uF0C8", "navicon": "\uF0C9", "reorder": "\uF0C9", "bars": "\uF0C9", "list-ul": "\uF0CA", "list-ol": "\uF0CB", "strikethrough": "\uF0CC", "underline": "\uF0CD", "table": "\uF0CE", "magic": "\uF0D0", "truck": "\uF0D1", "pinterest": "\uF0D2", "pinterest-square": "\uF0D3", "google-plus-square": "\uF0D4", "google-plus": "\uF0D5", "money": "\uF0D6", "caret-down": "\uF0D7", "caret-up": "\uF0D8", "caret-left": "\uF0D9", "caret-right": "\uF0DA", "columns": "\uF0DB", "unsorted": "\uF0DC", "sort": "\uF0DC", "sort-down": "\uF0DD", "sort-desc": "\uF0DD", "sort-up": "\uF0DE", "sort-asc": "\uF0DE", "envelope": "\uF0E0", "linkedin": "\uF0E1", "rotate-left": "\uF0E2", "undo": "\uF0E2", "legal": "\uF0E3", "gavel": "\uF0E3", "dashboard": "\uF0E4", "tachometer": "\uF0E4", "comment-o": "\uF0E5", "comments-o": "\uF0E6", "flash": "\uF0E7", "bolt": "\uF0E7", "sitemap": "\uF0E8", "umbrella": "\uF0E9", "paste": "\uF0EA", "clipboard": "\uF0EA", "lightbulb-o": "\uF0EB", "exchange": "\uF0EC", "cloud-download": "\uF0ED", "cloud-upload": "\uF0EE", "user-md": "\uF0F0", "stethoscope": "\uF0F1", "suitcase": "\uF0F2", "bell": "\uF0F3", "coffee": "\uF0F4", "cutlery": "\uF0F5", "file-text-o": "\uF0F6", "building-o": "\uF0F7", "hospital-o": "\uF0F8", "ambulance": "\uF0F9", "medkit": "\uF0FA", "fighter-jet": "\uF0FB", "beer": "\uF0FC", "h-square": "\uF0FD", "plus-square": "\uF0FE", "angle-double-left": "\uF100", "angle-double-right": "\uF101", "angle-double-up": "\uF102", "angle-double-down": "\uF103", "angle-left": "\uF104", "angle-right": "\uF105", "angle-up": "\uF106", "angle-down": "\uF107", "desktop": "\uF108", "laptop": "\uF109", "tablet": "\uF10A", "mobile-phone": "\uF10B", "mobile": "\uF10B", "circle-o": "\uF10C", "quote-left": "\uF10D", "quote-right": "\uF10E", "spinner": "\uF110", "circle": "\uF111", "mail-reply": "\uF112", "reply": "\uF112", "github-alt": "\uF113", "folder-o": "\uF114", "folder-open-o": "\uF115", "smile-o": "\uF118", "frown-o": "\uF119", "meh-o": "\uF11A", "gamepad": "\uF11B", "keyboard-o": "\uF11C", "flag-o": "\uF11D", "flag-checkered": "\uF11E", "terminal": "\uF120", "code": "\uF121", "mail-reply-all": "\uF122", "reply-all": "\uF122", "star-half-empty": "\uF123", "star-half-full": "\uF123", "star-half-o": "\uF123", "location-arrow": "\uF124", "crop": "\uF125", "code-fork": "\uF126", "unlink": "\uF127", "chain-broken": "\uF127", "question": "\uF128", "info": "\uF129", "exclamation": "\uF12A", "superscript": "\uF12B", "subscript": "\uF12C", "eraser": "\uF12D", "puzzle-piece": "\uF12E", "microphone": "\uF130", "microphone-slash": "\uF131", "shield": "\uF132", "calendar-o": "\uF133", "fire-extinguisher": "\uF134", "rocket": "\uF135", "maxcdn": "\uF136", "chevron-circle-left": "\uF137", "chevron-circle-right": "\uF138", "chevron-circle-up": "\uF139", "chevron-circle-down": "\uF13A", "html5": "\uF13B", "css3": "\uF13C", "anchor": "\uF13D", "unlock-alt": "\uF13E", "bullseye": "\uF140", "ellipsis-h": "\uF141", "ellipsis-v": "\uF142", "rss-square": "\uF143", "play-circle": "\uF144", "ticket": "\uF145", "minus-square": "\uF146", "minus-square-o": "\uF147", "level-up": "\uF148", "level-down": "\uF149", "check-square": "\uF14A", "pencil-square": "\uF14B", "external-link-square": "\uF14C", "share-square": "\uF14D", "compass": "\uF14E", "toggle-down": "\uF150", "caret-square-o-down": "\uF150", "toggle-up": "\uF151", "caret-square-o-up": "\uF151", "toggle-right": "\uF152", "caret-square-o-right": "\uF152", "fa-euro": "\uF153", "fa-eur": "\uF153", "gbp": "\uF154", "dollar": "\uF155", "usd": "\uF155", "rupee": "\uF156", "inr": "\uF156", "cny": "\uF157", "rmb": "\uF157", "yen": "\uF157", "jpy": "\uF157", "ruble": "\uF158", "rouble": "\uF158", "rub": "\uF158", "won": "\uF159", "krw": "\uF159", "bitcoin": "\uF15A", "btc": "\uF15A", "file": "\uF15B", "file-text": "\uF15C", "sort-alpha-asc": "\uF15D", "sort-alpha-desc": "\uF15E", "sort-amount-asc": "\uF160", "sort-amount-desc": "\uF161", "sort-numeric-asc": "\uF162", "sort-numeric-desc": "\uF163", "thumbs-up": "\uF164", "thumbs-down": "\uF165", "youtube-square": "\uF166", "youtube": "\uF167", "xing": "\uF168", "xing-square": "\uF169", "youtube-play": "\uF16A", "dropbox": "\uF16B", "stack-overflow": "\uF16C", "instagram": "\uF16D", "flickr": "\uF16E", "adn": "\uF170", "bitbucket": "\uF171", "bitbucket-square": "\uF172", "tumblr": "\uF173", "tumblr-square": "\uF174", "long-arrow-down": "\uF175", "long-arrow-up": "\uF176", "long-arrow-left": "\uF177", "long-arrow-right": "\uF178", "apple": "\uF179", "windows": "\uF17A", "android": "\uF17B", "linux": "\uF17C", "dribbble": "\uF17D", "skype": "\uF17E", "foursquare": "\uF180", "trello": "\uF181", "female": "\uF182", "male": "\uF183", "gittip": "\uF184", "gratipay": "\uF184", "sun-o": "\uF185", "moon-o": "\uF186", "archive": "\uF187", "bug": "\uF188", "vk": "\uF189", "weibo": "\uF18A", "renren": "\uF18B", "pagelines": "\uF18C", "stack-exchange": "\uF18D", "arrow-circle-o-right": "\uF18E", "arrow-circle-o-left": "\uF190", "toggle-left": "\uF191", "caret-square-o-left": "\uF191", "dot-circle-o": "\uF192", "wheelchair": "\uF193", "vimeo-square": "\uF194", "turkish-lira": "\uF195", "try": "\uF195", "plus-square-o": "\uF196", "space-shuttle": "\uF197", "slack": "\uF198", "envelope-square": "\uF199", "wordpress": "\uF19A", "openid": "\uF19B", "institution": "\uF19C", "bank": "\uF19C", "university": "\uF19C", "mortar-board": "\uF19D", "graduation-cap": "\uF19D", "yahoo": "\uF19E", "google": "\uF1A0", "reddit": "\uF1A1", "reddit-square": "\uF1A2", "stumbleupon-circle": "\uF1A3", "stumbleupon": "\uF1A4", "delicious": "\uF1A5", "digg": "\uF1A6", "pied-piper-pp": "\uF1A7", "pied-piper-alt": "\uF1A8", "drupal": "\uF1A9", "joomla": "\uF1AA", "language": "\uF1AB", "fax": "\uF1AC", "building": "\uF1AD", "child": "\uF1AE", "paw": "\uF1B0", "spoon": "\uF1B1", "cube": "\uF1B2", "cubes": "\uF1B3", "behance": "\uF1B4", "behance-square": "\uF1B5", "steam": "\uF1B6", "steam-square": "\uF1B7", "recycle": "\uF1B8", "automobile": "\uF1B9", "car": "\uF1B9", "cab": "\uF1BA", "taxi": "\uF1BA", "tree": "\uF1BB", "spotify": "\uF1BC", "deviantart": "\uF1BD", "soundcloud": "\uF1BE", "database": "\uF1C0", "file-pdf-o": "\uF1C1", "file-word-o": "\uF1C2", "file-excel-o": "\uF1C3", "file-powerpoint-o": "\uF1C4", "file-photo-o": "\uF1C5", "file-picture-o": "\uF1C5", "file-image-o": "\uF1C5", "file-zip-o": "\uF1C6", "file-archive-o": "\uF1C6", "file-sound-o": "\uF1C7", "file-audio-o": "\uF1C7", "file-movie-o": "\uF1C8", "file-video-o": "\uF1C8", "file-code-o": "\uF1C9", "vine": "\uF1CA", "codepen": "\uF1CB", "jsfiddle": "\uF1CC", "life-bouy": "\uF1CD", "life-buoy": "\uF1CD", "life-saver": "\uF1CD", "support": "\uF1CD", "life-ring": "\uF1CD", "circle-o-notch": "\uF1CE", "ra": "\uF1D0", "resistance": "\uF1D0", "rebel": "\uF1D0", "ge": "\uF1D1", "empire": "\uF1D1", "git-square": "\uF1D2", "git": "\uF1D3", "y-combinator-square": "\uF1D4", "yc-square": "\uF1D4", "hacker-news": "\uF1D4", "tencent-weibo": "\uF1D5", "qq": "\uF1D6", "wechat": "\uF1D7", "weixin": "\uF1D7", "send": "\uF1D8", "paper-plane": "\uF1D8", "send-o": "\uF1D9", "paper-plane-o": "\uF1D9", "history": "\uF1DA", "circle-thin": "\uF1DB", "header": "\uF1DC", "paragraph": "\uF1DD", "sliders": "\uF1DE", "share-alt": "\uF1E0", "share-alt-square": "\uF1E1", "bomb": "\uF1E2", "soccer-ball-o": "\uF1E3", "futbol-o": "\uF1E3", "tty": "\uF1E4", "binoculars": "\uF1E5", "plug": "\uF1E6", "slideshare": "\uF1E7", "twitch": "\uF1E8", "yelp": "\uF1E9", "newspaper-o": "\uF1EA", "wifi": "\uF1EB", "calculator": "\uF1EC", "paypal": "\uF1ED", "google-wallet": "\uF1EE", "cc-visa": "\uF1F0", "cc-mastercard": "\uF1F1", "cc-discover": "\uF1F2", "cc-amex": "\uF1F3", "cc-paypal": "\uF1F4", "cc-stripe": "\uF1F5", "bell-slash": "\uF1F6", "bell-slash-o": "\uF1F7", "trash": "\uF1F8", "copyright": "\uF1F9", "at": "\uF1FA", "eyedropper": "\uF1FB", "paint-brush": "\uF1FC", "birthday-cake": "\uF1FD", "area-chart": "\uF1FE", "pie-chart": "\uF200", "line-chart": "\uF201", "lastfm": "\uF202", "lastfm-square": "\uF203", "toggle-off": "\uF204", "toggle-on": "\uF205", "bicycle": "\uF206", "bus": "\uF207", "ioxhost": "\uF208", "angellist": "\uF209", "cc": "\uF20A", "shekel": "\uF20B", "sheqel": "\uF20B", "ils": "\uF20B", "meanpath": "\uF20C", "buysellads": "\uF20D", "connectdevelop": "\uF20E", "dashcube": "\uF210", "forumbee": "\uF211", "leanpub": "\uF212", "sellsy": "\uF213", "shirtsinbulk": "\uF214", "simplybuilt": "\uF215", "skyatlas": "\uF216", "cart-plus": "\uF217", "cart-arrow-down": "\uF218", "diamond": "\uF219", "ship": "\uF21A", "user-secret": "\uF21B", "motorcycle": "\uF21C", "street-view": "\uF21D", "heartbeat": "\uF21E", "venus": "\uF221", "mars": "\uF222", "mercury": "\uF223", "intersex": "\uF224", "transgender": "\uF224", "transgender-alt": "\uF225", "venus-double": "\uF226", "mars-double": "\uF227", "venus-mars": "\uF228", "mars-stroke": "\uF229", "mars-stroke-v": "\uF22A", "mars-stroke-h": "\uF22B", "neuter": "\uF22C", "genderless": "\uF22D", "facebook-official": "\uF230", "pinterest-p": "\uF231", "whatsapp": "\uF232", "server": "\uF233", "user-plus": "\uF234", "user-times": "\uF235", "hotel": "\uF236", "bed": "\uF236", "viacoin": "\uF237", "train": "\uF238", "subway": "\uF239", "medium": "\uF23A", "yc": "\uF23B", "y-combinator": "\uF23B", "optin-monster": "\uF23C", "opencart": "\uF23D", "expeditedssl": "\uF23E", "battery-4": "\uF240", "battery": "\uF240", "battery-full": "\uF240", "battery-3": "\uF241", "battery-three-quarters": "\uF241", "battery-2": "\uF242", "battery-half": "\uF242", "battery-1": "\uF243", "battery-quarter": "\uF243", "battery-0": "\uF244", "battery-empty": "\uF244", "mouse-pointer": "\uF245", "i-cursor": "\uF246", "object-group": "\uF247", "object-ungroup": "\uF248", "sticky-note": "\uF249", "sticky-note-o": "\uF24A", "cc-jcb": "\uF24B", "cc-diners-club": "\uF24C", "clone": "\uF24D", "balance-scale": "\uF24E", "hourglass-o": "\uF250", "hourglass-1": "\uF251", "hourglass-start": "\uF251", "hourglass-2": "\uF252", "hourglass-half": "\uF252", "hourglass-3": "\uF253", "hourglass-end": "\uF253", "hourglass": "\uF254", "hand-grab-o": "\uF255", "hand-rock-o": "\uF255", "hand-stop-o": "\uF256", "hand-paper-o": "\uF256", "hand-scissors-o": "\uF257", "hand-lizard-o": "\uF258", "hand-spock-o": "\uF259", "hand-pointer-o": "\uF25A", "hand-peace-o": "\uF25B", "trademark": "\uF25C", "registered": "\uF25D", "creative-commons": "\uF25E", "gg": "\uF260", "gg-circle": "\uF261", "tripadvisor": "\uF262", "odnoklassniki": "\uF263", "odnoklassniki-square": "\uF264", "get-pocket": "\uF265", "wikipedia-w": "\uF266", "safari": "\uF267", "chrome": "\uF268", "firefox": "\uF269", "opera": "\uF26A", "internet-explorer": "\uF26B", "tv": "\uF26C", "television": "\uF26C", "contao": "\uF26D", "500px": "\uF26E", "amazon": "\uF270", "calendar-plus-o": "\uF271", "calendar-minus-o": "\uF272", "calendar-times-o": "\uF273", "calendar-check-o": "\uF274", "industry": "\uF275", "map-pin": "\uF276", "map-signs": "\uF277", "map-o": "\uF278", "map": "\uF279", "commenting": "\uF27A", "commenting-o": "\uF27B", "houzz": "\uF27C", "vimeo": "\uF27D", "black-tie": "\uF27E", "fonticons": "\uF280", "reddit-alien": "\uF281", "edge": "\uF282", "credit-card-alt": "\uF283", "codiepie": "\uF284", "modx": "\uF285", "fort-awesome": "\uF286", "usb": "\uF287", "product-hunt": "\uF288", "mixcloud": "\uF289", "scribd": "\uF28A", "pause-circle": "\uF28B", "pause-circle-o": "\uF28C", "stop-circle": "\uF28D", "stop-circle-o": "\uF28E", "shopping-bag": "\uF290", "shopping-basket": "\uF291", "hashtag": "\uF292", "bluetooth": "\uF293", "bluetooth-b": "\uF294", "percent": "\uF295", "gitlab": "\uF296", "wpbeginner": "\uF297", "wpforms": "\uF298", "envira": "\uF299", "universal-access": "\uF29A", "wheelchair-alt": "\uF29B", "question-circle-o": "\uF29C", "blind": "\uF29D", "audio-description": "\uF29E", "volume-control-phone": "\uF2A0", "braille": "\uF2A1", "assistive-listening-systems": "\uF2A2", "asl-interpreting": "\uF2A3", "american-sign-language-interpreting": "\uF2A3", "deafness": "\uF2A4", "hard-of-hearing": "\uF2A4", "deaf": "\uF2A4", "glide": "\uF2A5", "glide-g": "\uF2A6", "signing": "\uF2A7", "sign-language": "\uF2A7", "low-vision": "\uF2A8", "viadeo": "\uF2A9", "viadeo-square": "\uF2AA", "snapchat": "\uF2AB", "snapchat-ghost": "\uF2AC", "snapchat-square": "\uF2AD", "pied-piper": "\uF2AE", "first-order": "\uF2B0", "yoast": "\uF2B1", "themeisle": "\uF2B2", "google-plus-circle": "\uF2B3", "google-plus-official": "\uF2B3", "fa": "\uF2B4", "font-awesome": "\uF2B4", "handshake-o": "\uF2B5", "envelope-open": "\uF2B6", "envelope-open-o": "\uF2B7", "linode": "\uF2B8", "address-book": "\uF2B9", "address-book-o": "\uF2BA", "vcard": "\uF2BB", "address-card": "\uF2BB", "vcard-o": "\uF2BC", "address-card-o": "\uF2BC", "user-circle": "\uF2BD", "user-circle-o": "\uF2BE", "user-o": "\uF2C0", "id-badge": "\uF2C1", "drivers-license": "\uF2C2", "id-card": "\uF2C2", "drivers-license-o": "\uF2C3", "id-card-o": "\uF2C3", "quora": "\uF2C4", "free-code-camp": "\uF2C5", "telegram": "\uF2C6", "thermometer-4": "\uF2C7", "thermometer": "\uF2C7", "thermometer-full": "\uF2C7", "thermometer-3": "\uF2C8", "thermometer-three-quarters": "\uF2C8", "thermometer-2": "\uF2C9", "thermometer-half": "\uF2C9", "thermometer-1": "\uF2CA", "thermometer-quarter": "\uF2CA", "thermometer-0": "\uF2CB", "thermometer-empty": "\uF2CB", "shower": "\uF2CC", "bathtub": "\uF2CD", "s15": "\uF2CD", "bath": "\uF2CD", "podcast": "\uF2CE", "window-maximize": "\uF2D0", "window-minimize": "\uF2D1", "window-restore": "\uF2D2", "times-rectangle": "\uF2D3", "window-close": "\uF2D3", "times-rectangle-o": "\uF2D4", "window-close-o": "\uF2D4", "bandcamp": "\uF2D5", "grav": "\uF2D6", "etsy": "\uF2D7", "imdb": "\uF2D8", "ravelry": "\uF2D9", "eercast": "\uF2DA", "microchip": "\uF2DB", "snowflake-o": "\uF2DC", "superpowers": "\uF2DD", "wpexplorer": "\uF2DE", "meetup": "\uF2E0" };exports.default = _default;
-
-/***/ }),
-
-/***/ 42:
-/*!**********************************************************************************************!*\
-  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/axios/lib/axios.js ***!
-  \**********************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./utils */ 43);
-var bind = __webpack_require__(/*! ./helpers/bind */ 44);
-var Axios = __webpack_require__(/*! ./core/Axios */ 45);
-var mergeConfig = __webpack_require__(/*! ./core/mergeConfig */ 65);
-var defaults = __webpack_require__(/*! ./defaults */ 51);
-
-/**
-                                       * Create an instance of Axios
-                                       *
-                                       * @param {Object} defaultConfig The default config for the instance
-                                       * @return {Axios} A new instance of Axios
-                                       */
-function createInstance(defaultConfig) {
-  var context = new Axios(defaultConfig);
-  var instance = bind(Axios.prototype.request, context);
-
-  // Copy axios.prototype to instance
-  utils.extend(instance, Axios.prototype, context);
-
-  // Copy context to instance
-  utils.extend(instance, context);
-
-  return instance;
-}
-
-// Create the default instance to be exported
-var axios = createInstance(defaults);
-
-// Expose Axios class to allow class inheritance
-axios.Axios = Axios;
-
-// Factory for creating new instances
-axios.create = function create(instanceConfig) {
-  return createInstance(mergeConfig(axios.defaults, instanceConfig));
-};
-
-// Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(/*! ./cancel/Cancel */ 66);
-axios.CancelToken = __webpack_require__(/*! ./cancel/CancelToken */ 67);
-axios.isCancel = __webpack_require__(/*! ./cancel/isCancel */ 50);
-
-// Expose all/spread
-axios.all = function all(promises) {
-  return Promise.all(promises);
-};
-axios.spread = __webpack_require__(/*! ./helpers/spread */ 68);
-
-// Expose isAxiosError
-axios.isAxiosError = __webpack_require__(/*! ./helpers/isAxiosError */ 69);
-
-module.exports = axios;
-
-// Allow use of default import syntax in TypeScript
-module.exports.default = axios;
-
-/***/ }),
-
-/***/ 428:
-/*!********************************************************************************************!*\
-  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/components/uni-icons/icons.js ***!
-  \********************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = {
-  'contact': "\uE100",
-  'person': "\uE101",
-  'personadd': "\uE102",
-  'contact-filled': "\uE130",
-  'person-filled': "\uE131",
-  'personadd-filled': "\uE132",
-  'phone': "\uE200",
-  'email': "\uE201",
-  'chatbubble': "\uE202",
-  'chatboxes': "\uE203",
-  'phone-filled': "\uE230",
-  'email-filled': "\uE231",
-  'chatbubble-filled': "\uE232",
-  'chatboxes-filled': "\uE233",
-  'weibo': "\uE260",
-  'weixin': "\uE261",
-  'pengyouquan': "\uE262",
-  'chat': "\uE263",
-  'qq': "\uE264",
-  'videocam': "\uE300",
-  'camera': "\uE301",
-  'mic': "\uE302",
-  'location': "\uE303",
-  'mic-filled': "\uE332",
-  'speech': "\uE332",
-  'location-filled': "\uE333",
-  'micoff': "\uE360",
-  'image': "\uE363",
-  'map': "\uE364",
-  'compose': "\uE400",
-  'trash': "\uE401",
-  'upload': "\uE402",
-  'download': "\uE403",
-  'close': "\uE404",
-  'redo': "\uE405",
-  'undo': "\uE406",
-  'refresh': "\uE407",
-  'star': "\uE408",
-  'plus': "\uE409",
-  'minus': "\uE410",
-  'circle': "\uE411",
-  'checkbox': "\uE411",
-  'close-filled': "\uE434",
-  'clear': "\uE434",
-  'refresh-filled': "\uE437",
-  'star-filled': "\uE438",
-  'plus-filled': "\uE439",
-  'minus-filled': "\uE440",
-  'circle-filled': "\uE441",
-  'checkbox-filled': "\uE442",
-  'closeempty': "\uE460",
-  'refreshempty': "\uE461",
-  'reload': "\uE462",
-  'starhalf': "\uE463",
-  'spinner': "\uE464",
-  'spinner-cycle': "\uE465",
-  'search': "\uE466",
-  'plusempty': "\uE468",
-  'forward': "\uE470",
-  'back': "\uE471",
-  'left-nav': "\uE471",
-  'checkmarkempty': "\uE472",
-  'home': "\uE500",
-  'navigate': "\uE501",
-  'gear': "\uE502",
-  'paperplane': "\uE503",
-  'info': "\uE504",
-  'help': "\uE505",
-  'locked': "\uE506",
-  'more': "\uE507",
-  'flag': "\uE508",
-  'home-filled': "\uE530",
-  'gear-filled': "\uE532",
-  'info-filled': "\uE534",
-  'help-filled': "\uE535",
-  'more-filled': "\uE537",
-  'settings': "\uE560",
-  'list': "\uE562",
-  'bars': "\uE563",
-  'loop': "\uE565",
-  'paperclip': "\uE567",
-  'eye': "\uE568",
-  'arrowup': "\uE580",
-  'arrowdown': "\uE581",
-  'arrowleft': "\uE582",
-  'arrowright': "\uE583",
-  'arrowthinup': "\uE584",
-  'arrowthindown': "\uE585",
-  'arrowthinleft': "\uE586",
-  'arrowthinright': "\uE587",
-  'pulldown': "\uE588",
-  'closefill': "\uE589",
-  'sound': "\uE590",
-  'scan': "\uE612" };exports.default = _default;
-
-/***/ }),
-
-/***/ 43:
-/*!**********************************************************************************************!*\
-  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/axios/lib/utils.js ***!
-  \**********************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var bind = __webpack_require__(/*! ./helpers/bind */ 44);
-
-/*global toString:true*/
-
-// utils is a library of generic helper functions non-specific to axios
-
-var toString = Object.prototype.toString;
-
-/**
-                                           * Determine if a value is an Array
-                                           *
-                                           * @param {Object} val The value to test
-                                           * @returns {boolean} True if value is an Array, otherwise false
-                                           */
-function isArray(val) {
-  return toString.call(val) === '[object Array]';
-}
-
-/**
-   * Determine if a value is undefined
-   *
-   * @param {Object} val The value to test
-   * @returns {boolean} True if the value is undefined, otherwise false
-   */
-function isUndefined(val) {
-  return typeof val === 'undefined';
-}
-
-/**
-   * Determine if a value is a Buffer
-   *
-   * @param {Object} val The value to test
-   * @returns {boolean} True if value is a Buffer, otherwise false
-   */
-function isBuffer(val) {
-  return val !== null && !isUndefined(val) && val.constructor !== null && !isUndefined(val.constructor) &&
-  typeof val.constructor.isBuffer === 'function' && val.constructor.isBuffer(val);
-}
-
-/**
-   * Determine if a value is an ArrayBuffer
-   *
-   * @param {Object} val The value to test
-   * @returns {boolean} True if value is an ArrayBuffer, otherwise false
-   */
-function isArrayBuffer(val) {
-  return toString.call(val) === '[object ArrayBuffer]';
-}
-
-/**
-   * Determine if a value is a FormData
-   *
-   * @param {Object} val The value to test
-   * @returns {boolean} True if value is an FormData, otherwise false
-   */
-function isFormData(val) {
-  return typeof FormData !== 'undefined' && val instanceof FormData;
-}
-
-/**
-   * Determine if a value is a view on an ArrayBuffer
-   *
-   * @param {Object} val The value to test
-   * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
-   */
-function isArrayBufferView(val) {
-  var result;
-  if (typeof ArrayBuffer !== 'undefined' && ArrayBuffer.isView) {
-    result = ArrayBuffer.isView(val);
-  } else {
-    result = val && val.buffer && val.buffer instanceof ArrayBuffer;
-  }
-  return result;
-}
-
-/**
-   * Determine if a value is a String
-   *
-   * @param {Object} val The value to test
-   * @returns {boolean} True if value is a String, otherwise false
-   */
-function isString(val) {
-  return typeof val === 'string';
-}
-
-/**
-   * Determine if a value is a Number
-   *
-   * @param {Object} val The value to test
-   * @returns {boolean} True if value is a Number, otherwise false
-   */
-function isNumber(val) {
-  return typeof val === 'number';
-}
-
-/**
-   * Determine if a value is an Object
-   *
-   * @param {Object} val The value to test
-   * @returns {boolean} True if value is an Object, otherwise false
-   */
-function isObject(val) {
-  return val !== null && typeof val === 'object';
-}
-
-/**
-   * Determine if a value is a plain Object
-   *
-   * @param {Object} val The value to test
-   * @return {boolean} True if value is a plain Object, otherwise false
-   */
-function isPlainObject(val) {
-  if (toString.call(val) !== '[object Object]') {
-    return false;
-  }
-
-  var prototype = Object.getPrototypeOf(val);
-  return prototype === null || prototype === Object.prototype;
-}
-
-/**
-   * Determine if a value is a Date
-   *
-   * @param {Object} val The value to test
-   * @returns {boolean} True if value is a Date, otherwise false
-   */
-function isDate(val) {
-  return toString.call(val) === '[object Date]';
-}
-
-/**
-   * Determine if a value is a File
-   *
-   * @param {Object} val The value to test
-   * @returns {boolean} True if value is a File, otherwise false
-   */
-function isFile(val) {
-  return toString.call(val) === '[object File]';
-}
-
-/**
-   * Determine if a value is a Blob
-   *
-   * @param {Object} val The value to test
-   * @returns {boolean} True if value is a Blob, otherwise false
-   */
-function isBlob(val) {
-  return toString.call(val) === '[object Blob]';
-}
-
-/**
-   * Determine if a value is a Function
-   *
-   * @param {Object} val The value to test
-   * @returns {boolean} True if value is a Function, otherwise false
-   */
-function isFunction(val) {
-  return toString.call(val) === '[object Function]';
-}
-
-/**
-   * Determine if a value is a Stream
-   *
-   * @param {Object} val The value to test
-   * @returns {boolean} True if value is a Stream, otherwise false
-   */
-function isStream(val) {
-  return isObject(val) && isFunction(val.pipe);
-}
-
-/**
-   * Determine if a value is a URLSearchParams object
-   *
-   * @param {Object} val The value to test
-   * @returns {boolean} True if value is a URLSearchParams object, otherwise false
-   */
-function isURLSearchParams(val) {
-  return typeof URLSearchParams !== 'undefined' && val instanceof URLSearchParams;
-}
-
-/**
-   * Trim excess whitespace off the beginning and end of a string
-   *
-   * @param {String} str The String to trim
-   * @returns {String} The String freed of excess whitespace
-   */
-function trim(str) {
-  return str.replace(/^\s*/, '').replace(/\s*$/, '');
-}
-
-/**
-   * Determine if we're running in a standard browser environment
-   *
-   * This allows axios to run in a web worker, and react-native.
-   * Both environments support XMLHttpRequest, but not fully standard globals.
-   *
-   * web workers:
-   *  typeof window -> undefined
-   *  typeof document -> undefined
-   *
-   * react-native:
-   *  navigator.product -> 'ReactNative'
-   * nativescript
-   *  navigator.product -> 'NativeScript' or 'NS'
-   */
-function isStandardBrowserEnv() {
-  if (typeof navigator !== 'undefined' && (navigator.product === 'ReactNative' ||
-  navigator.product === 'NativeScript' ||
-  navigator.product === 'NS')) {
-    return false;
-  }
-  return (
-    typeof window !== 'undefined' &&
-    typeof document !== 'undefined');
-
-}
-
-/**
-   * Iterate over an Array or an Object invoking a function for each item.
-   *
-   * If `obj` is an Array callback will be called passing
-   * the value, index, and complete array for each item.
-   *
-   * If 'obj' is an Object callback will be called passing
-   * the value, key, and complete object for each property.
-   *
-   * @param {Object|Array} obj The object to iterate
-   * @param {Function} fn The callback to invoke for each item
-   */
-function forEach(obj, fn) {
-  // Don't bother if no value provided
-  if (obj === null || typeof obj === 'undefined') {
-    return;
-  }
-
-  // Force an array if not already something iterable
-  if (typeof obj !== 'object') {
-    /*eslint no-param-reassign:0*/
-    obj = [obj];
-  }
-
-  if (isArray(obj)) {
-    // Iterate over array values
-    for (var i = 0, l = obj.length; i < l; i++) {
-      fn.call(null, obj[i], i, obj);
-    }
-  } else {
-    // Iterate over object keys
-    for (var key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        fn.call(null, obj[key], key, obj);
-      }
-    }
-  }
-}
-
-/**
-   * Accepts varargs expecting each argument to be an object, then
-   * immutably merges the properties of each object and returns result.
-   *
-   * When multiple objects contain the same key the later object in
-   * the arguments list will take precedence.
-   *
-   * Example:
-   *
-   * ```js
-   * var result = merge({foo: 123}, {foo: 456});
-   * console.log(result.foo); // outputs 456
-   * ```
-   *
-   * @param {Object} obj1 Object to merge
-   * @returns {Object} Result of all merge properties
-   */
-function merge() /* obj1, obj2, obj3, ... */{
-  var result = {};
-  function assignValue(val, key) {
-    if (isPlainObject(result[key]) && isPlainObject(val)) {
-      result[key] = merge(result[key], val);
-    } else if (isPlainObject(val)) {
-      result[key] = merge({}, val);
-    } else if (isArray(val)) {
-      result[key] = val.slice();
-    } else {
-      result[key] = val;
-    }
-  }
-
-  for (var i = 0, l = arguments.length; i < l; i++) {
-    forEach(arguments[i], assignValue);
-  }
-  return result;
-}
-
-/**
-   * Extends object a by mutably adding to it the properties of object b.
-   *
-   * @param {Object} a The object to be extended
-   * @param {Object} b The object to copy properties from
-   * @param {Object} thisArg The object to bind function to
-   * @return {Object} The resulting value of object a
-   */
-function extend(a, b, thisArg) {
-  forEach(b, function assignValue(val, key) {
-    if (thisArg && typeof val === 'function') {
-      a[key] = bind(val, thisArg);
-    } else {
-      a[key] = val;
-    }
-  });
-  return a;
-}
-
-/**
-   * Remove byte order marker. This catches EF BB BF (the UTF-8 BOM)
-   *
-   * @param {string} content with BOM
-   * @return {string} content value without BOM
-   */
-function stripBOM(content) {
-  if (content.charCodeAt(0) === 0xFEFF) {
-    content = content.slice(1);
-  }
-  return content;
-}
-
-module.exports = {
-  isArray: isArray,
-  isArrayBuffer: isArrayBuffer,
-  isBuffer: isBuffer,
-  isFormData: isFormData,
-  isArrayBufferView: isArrayBufferView,
-  isString: isString,
-  isNumber: isNumber,
-  isObject: isObject,
-  isPlainObject: isPlainObject,
-  isUndefined: isUndefined,
-  isDate: isDate,
-  isFile: isFile,
-  isBlob: isBlob,
-  isFunction: isFunction,
-  isStream: isStream,
-  isURLSearchParams: isURLSearchParams,
-  isStandardBrowserEnv: isStandardBrowserEnv,
-  forEach: forEach,
-  merge: merge,
-  extend: extend,
-  trim: trim,
-  stripBOM: stripBOM };
-
-/***/ }),
-
-/***/ 44:
-/*!*****************************************************************************************************!*\
-  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/axios/lib/helpers/bind.js ***!
-  \*****************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = function bind(fn, thisArg) {
-  return function wrap() {
-    var args = new Array(arguments.length);
-    for (var i = 0; i < args.length; i++) {
-      args[i] = arguments[i];
-    }
-    return fn.apply(thisArg, args);
-  };
-};
-
-/***/ }),
-
 /***/ 45:
 /*!***************************************************************************************************!*\
   !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/axios/lib/core/Axios.js ***!
@@ -14078,7 +14070,390 @@ module.exports = Axios;
 
 /***/ }),
 
-/***/ 450:
+/***/ 457:
+/*!*********************************************************************************************!*\
+  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/components/evan-icons/icons.js ***!
+  \*********************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = { "glass": "\uF000", "music": "\uF001", "search": "\uF002", "envelope-o": "\uF003", "heart": "\uF004", "star": "\uF005", "star-o": "\uF006", "user": "\uF007", "film": "\uF008", "th-large": "\uF009", "th": "\uF00A", "th-list": "\uF00B", "check": "\uF00C", "remove": "\uF00D", "close": "\uF00D", "times": "\uF00D", "search-plus": "\uF00E", "search-minus": "\uF010", "power-off": "\uF011", "signal": "\uF012", "gear": "\uF013", "cog": "\uF013", "trash-o": "\uF014", "home": "\uF015", "file-o": "\uF016", "clock-o": "\uF017", "road": "\uF018", "download": "\uF019", "arrow-circle-o-down": "\uF01A", "arrow-circle-o-up": "\uF01B", "inbox": "\uF01C", "play-circle-o": "\uF01D", "rotate-right": "\uF01E", "repeat": "\uF01E", "refresh": "\uF021", "list-alt": "\uF022", "lock": "\uF023", "flag": "\uF024", "headphones": "\uF025", "volume-off": "\uF026", "volume-down": "\uF027", "volume-up": "\uF028", "qrcode": "\uF029", "barcode": "\uF02A", "tag": "\uF02B", "tags": "\uF02C", "book": "\uF02D", "bookmark": "\uF02E", "print": "\uF02F", "camera": "\uF030", "font": "\uF031", "bold": "\uF032", "italic": "\uF033", "text-height": "\uF034", "text-width": "\uF035", "align-left": "\uF036", "align-center": "\uF037", "align-right": "\uF038", "align-justify": "\uF039", "list": "\uF03A", "dedent": "\uF03B", "outdent": "\uF03B", "indent": "\uF03C", "video-camera": "\uF03D", "photo": "\uF03E", "image": "\uF03E", "picture-o": "\uF03E", "pencil": "\uF040", "map-marker": "\uF041", "adjust": "\uF042", "tint": "\uF043", "edit": "\uF044", "pencil-square-o": "\uF044", "share-square-o": "\uF045", "check-square-o": "\uF046", "arrows": "\uF047", "step-backward": "\uF048", "fast-backward": "\uF049", "backward": "\uF04A", "play": "\uF04B", "pause": "\uF04C", "stop": "\uF04D", "forward": "\uF04E", "fast-forward": "\uF050", "step-forward": "\uF051", "eject": "\uF052", "chevron-left": "\uF053", "chevron-right": "\uF054", "plus-circle": "\uF055", "minus-circle": "\uF056", "times-circle": "\uF057", "check-circle": "\uF058", "question-circle": "\uF059", "info-circle": "\uF05A", "crosshairs": "\uF05B", "times-circle-o": "\uF05C", "check-circle-o": "\uF05D", "ban": "\uF05E", "arrow-left": "\uF060", "arrow-right": "\uF061", "arrow-up": "\uF062", "arrow-down": "\uF063", "mail-forward": "\uF064", "share": "\uF064", "expand": "\uF065", "compress": "\uF066", "plus": "\uF067", "minus": "\uF068", "asterisk": "\uF069", "exclamation-circle": "\uF06A", "gift": "\uF06B", "leaf": "\uF06C", "fire": "\uF06D", "eye": "\uF06E", "eye-slash": "\uF070", "warning": "\uF071", "exclamation-triangle": "\uF071", "plane": "\uF072", "calendar": "\uF073", "random": "\uF074", "comment": "\uF075", "magnet": "\uF076", "chevron-up": "\uF077", "chevron-down": "\uF078", "retweet": "\uF079", "shopping-cart": "\uF07A", "folder": "\uF07B", "folder-open": "\uF07C", "arrows-v": "\uF07D", "arrows-h": "\uF07E", "bar-chart-o": "\uF080", "bar-chart": "\uF080", "twitter-square": "\uF081", "facebook-square": "\uF082", "camera-retro": "\uF083", "key": "\uF084", "gears": "\uF085", "cogs": "\uF085", "comments": "\uF086", "thumbs-o-up": "\uF087", "thumbs-o-down": "\uF088", "star-half": "\uF089", "heart-o": "\uF08A", "sign-out": "\uF08B", "linkedin-square": "\uF08C", "thumb-tack": "\uF08D", "external-link": "\uF08E", "sign-in": "\uF090", "trophy": "\uF091", "github-square": "\uF092", "upload": "\uF093", "lemon-o": "\uF094", "phone": "\uF095", "square-o": "\uF096", "bookmark-o": "\uF097", "phone-square": "\uF098", "twitter": "\uF099", "facebook-f": "\uF09A", "facebook": "\uF09A", "github": "\uF09B", "unlock": "\uF09C", "credit-card": "\uF09D", "feed": "\uF09E", "rss": "\uF09E", "hdd-o": "\uF0A0", "bullhorn": "\uF0A1", "bell-o": "\uF0A2", "certificate": "\uF0A3", "hand-o-right": "\uF0A4", "hand-o-left": "\uF0A5", "hand-o-up": "\uF0A6", "hand-o-down": "\uF0A7", "arrow-circle-left": "\uF0A8", "arrow-circle-right": "\uF0A9", "arrow-circle-up": "\uF0AA", "arrow-circle-down": "\uF0AB", "globe": "\uF0AC", "wrench": "\uF0AD", "tasks": "\uF0AE", "filter": "\uF0B0", "briefcase": "\uF0B1", "arrows-alt": "\uF0B2", "group": "\uF0C0", "users": "\uF0C0", "chain": "\uF0C1", "link": "\uF0C1", "cloud": "\uF0C2", "flask": "\uF0C3", "cut": "\uF0C4", "scissors": "\uF0C4", "copy": "\uF0C5", "files-o": "\uF0C5", "paperclip": "\uF0C6", "save": "\uF0C7", "floppy-o": "\uF0C7", "square": "\uF0C8", "navicon": "\uF0C9", "reorder": "\uF0C9", "bars": "\uF0C9", "list-ul": "\uF0CA", "list-ol": "\uF0CB", "strikethrough": "\uF0CC", "underline": "\uF0CD", "table": "\uF0CE", "magic": "\uF0D0", "truck": "\uF0D1", "pinterest": "\uF0D2", "pinterest-square": "\uF0D3", "google-plus-square": "\uF0D4", "google-plus": "\uF0D5", "money": "\uF0D6", "caret-down": "\uF0D7", "caret-up": "\uF0D8", "caret-left": "\uF0D9", "caret-right": "\uF0DA", "columns": "\uF0DB", "unsorted": "\uF0DC", "sort": "\uF0DC", "sort-down": "\uF0DD", "sort-desc": "\uF0DD", "sort-up": "\uF0DE", "sort-asc": "\uF0DE", "envelope": "\uF0E0", "linkedin": "\uF0E1", "rotate-left": "\uF0E2", "undo": "\uF0E2", "legal": "\uF0E3", "gavel": "\uF0E3", "dashboard": "\uF0E4", "tachometer": "\uF0E4", "comment-o": "\uF0E5", "comments-o": "\uF0E6", "flash": "\uF0E7", "bolt": "\uF0E7", "sitemap": "\uF0E8", "umbrella": "\uF0E9", "paste": "\uF0EA", "clipboard": "\uF0EA", "lightbulb-o": "\uF0EB", "exchange": "\uF0EC", "cloud-download": "\uF0ED", "cloud-upload": "\uF0EE", "user-md": "\uF0F0", "stethoscope": "\uF0F1", "suitcase": "\uF0F2", "bell": "\uF0F3", "coffee": "\uF0F4", "cutlery": "\uF0F5", "file-text-o": "\uF0F6", "building-o": "\uF0F7", "hospital-o": "\uF0F8", "ambulance": "\uF0F9", "medkit": "\uF0FA", "fighter-jet": "\uF0FB", "beer": "\uF0FC", "h-square": "\uF0FD", "plus-square": "\uF0FE", "angle-double-left": "\uF100", "angle-double-right": "\uF101", "angle-double-up": "\uF102", "angle-double-down": "\uF103", "angle-left": "\uF104", "angle-right": "\uF105", "angle-up": "\uF106", "angle-down": "\uF107", "desktop": "\uF108", "laptop": "\uF109", "tablet": "\uF10A", "mobile-phone": "\uF10B", "mobile": "\uF10B", "circle-o": "\uF10C", "quote-left": "\uF10D", "quote-right": "\uF10E", "spinner": "\uF110", "circle": "\uF111", "mail-reply": "\uF112", "reply": "\uF112", "github-alt": "\uF113", "folder-o": "\uF114", "folder-open-o": "\uF115", "smile-o": "\uF118", "frown-o": "\uF119", "meh-o": "\uF11A", "gamepad": "\uF11B", "keyboard-o": "\uF11C", "flag-o": "\uF11D", "flag-checkered": "\uF11E", "terminal": "\uF120", "code": "\uF121", "mail-reply-all": "\uF122", "reply-all": "\uF122", "star-half-empty": "\uF123", "star-half-full": "\uF123", "star-half-o": "\uF123", "location-arrow": "\uF124", "crop": "\uF125", "code-fork": "\uF126", "unlink": "\uF127", "chain-broken": "\uF127", "question": "\uF128", "info": "\uF129", "exclamation": "\uF12A", "superscript": "\uF12B", "subscript": "\uF12C", "eraser": "\uF12D", "puzzle-piece": "\uF12E", "microphone": "\uF130", "microphone-slash": "\uF131", "shield": "\uF132", "calendar-o": "\uF133", "fire-extinguisher": "\uF134", "rocket": "\uF135", "maxcdn": "\uF136", "chevron-circle-left": "\uF137", "chevron-circle-right": "\uF138", "chevron-circle-up": "\uF139", "chevron-circle-down": "\uF13A", "html5": "\uF13B", "css3": "\uF13C", "anchor": "\uF13D", "unlock-alt": "\uF13E", "bullseye": "\uF140", "ellipsis-h": "\uF141", "ellipsis-v": "\uF142", "rss-square": "\uF143", "play-circle": "\uF144", "ticket": "\uF145", "minus-square": "\uF146", "minus-square-o": "\uF147", "level-up": "\uF148", "level-down": "\uF149", "check-square": "\uF14A", "pencil-square": "\uF14B", "external-link-square": "\uF14C", "share-square": "\uF14D", "compass": "\uF14E", "toggle-down": "\uF150", "caret-square-o-down": "\uF150", "toggle-up": "\uF151", "caret-square-o-up": "\uF151", "toggle-right": "\uF152", "caret-square-o-right": "\uF152", "fa-euro": "\uF153", "fa-eur": "\uF153", "gbp": "\uF154", "dollar": "\uF155", "usd": "\uF155", "rupee": "\uF156", "inr": "\uF156", "cny": "\uF157", "rmb": "\uF157", "yen": "\uF157", "jpy": "\uF157", "ruble": "\uF158", "rouble": "\uF158", "rub": "\uF158", "won": "\uF159", "krw": "\uF159", "bitcoin": "\uF15A", "btc": "\uF15A", "file": "\uF15B", "file-text": "\uF15C", "sort-alpha-asc": "\uF15D", "sort-alpha-desc": "\uF15E", "sort-amount-asc": "\uF160", "sort-amount-desc": "\uF161", "sort-numeric-asc": "\uF162", "sort-numeric-desc": "\uF163", "thumbs-up": "\uF164", "thumbs-down": "\uF165", "youtube-square": "\uF166", "youtube": "\uF167", "xing": "\uF168", "xing-square": "\uF169", "youtube-play": "\uF16A", "dropbox": "\uF16B", "stack-overflow": "\uF16C", "instagram": "\uF16D", "flickr": "\uF16E", "adn": "\uF170", "bitbucket": "\uF171", "bitbucket-square": "\uF172", "tumblr": "\uF173", "tumblr-square": "\uF174", "long-arrow-down": "\uF175", "long-arrow-up": "\uF176", "long-arrow-left": "\uF177", "long-arrow-right": "\uF178", "apple": "\uF179", "windows": "\uF17A", "android": "\uF17B", "linux": "\uF17C", "dribbble": "\uF17D", "skype": "\uF17E", "foursquare": "\uF180", "trello": "\uF181", "female": "\uF182", "male": "\uF183", "gittip": "\uF184", "gratipay": "\uF184", "sun-o": "\uF185", "moon-o": "\uF186", "archive": "\uF187", "bug": "\uF188", "vk": "\uF189", "weibo": "\uF18A", "renren": "\uF18B", "pagelines": "\uF18C", "stack-exchange": "\uF18D", "arrow-circle-o-right": "\uF18E", "arrow-circle-o-left": "\uF190", "toggle-left": "\uF191", "caret-square-o-left": "\uF191", "dot-circle-o": "\uF192", "wheelchair": "\uF193", "vimeo-square": "\uF194", "turkish-lira": "\uF195", "try": "\uF195", "plus-square-o": "\uF196", "space-shuttle": "\uF197", "slack": "\uF198", "envelope-square": "\uF199", "wordpress": "\uF19A", "openid": "\uF19B", "institution": "\uF19C", "bank": "\uF19C", "university": "\uF19C", "mortar-board": "\uF19D", "graduation-cap": "\uF19D", "yahoo": "\uF19E", "google": "\uF1A0", "reddit": "\uF1A1", "reddit-square": "\uF1A2", "stumbleupon-circle": "\uF1A3", "stumbleupon": "\uF1A4", "delicious": "\uF1A5", "digg": "\uF1A6", "pied-piper-pp": "\uF1A7", "pied-piper-alt": "\uF1A8", "drupal": "\uF1A9", "joomla": "\uF1AA", "language": "\uF1AB", "fax": "\uF1AC", "building": "\uF1AD", "child": "\uF1AE", "paw": "\uF1B0", "spoon": "\uF1B1", "cube": "\uF1B2", "cubes": "\uF1B3", "behance": "\uF1B4", "behance-square": "\uF1B5", "steam": "\uF1B6", "steam-square": "\uF1B7", "recycle": "\uF1B8", "automobile": "\uF1B9", "car": "\uF1B9", "cab": "\uF1BA", "taxi": "\uF1BA", "tree": "\uF1BB", "spotify": "\uF1BC", "deviantart": "\uF1BD", "soundcloud": "\uF1BE", "database": "\uF1C0", "file-pdf-o": "\uF1C1", "file-word-o": "\uF1C2", "file-excel-o": "\uF1C3", "file-powerpoint-o": "\uF1C4", "file-photo-o": "\uF1C5", "file-picture-o": "\uF1C5", "file-image-o": "\uF1C5", "file-zip-o": "\uF1C6", "file-archive-o": "\uF1C6", "file-sound-o": "\uF1C7", "file-audio-o": "\uF1C7", "file-movie-o": "\uF1C8", "file-video-o": "\uF1C8", "file-code-o": "\uF1C9", "vine": "\uF1CA", "codepen": "\uF1CB", "jsfiddle": "\uF1CC", "life-bouy": "\uF1CD", "life-buoy": "\uF1CD", "life-saver": "\uF1CD", "support": "\uF1CD", "life-ring": "\uF1CD", "circle-o-notch": "\uF1CE", "ra": "\uF1D0", "resistance": "\uF1D0", "rebel": "\uF1D0", "ge": "\uF1D1", "empire": "\uF1D1", "git-square": "\uF1D2", "git": "\uF1D3", "y-combinator-square": "\uF1D4", "yc-square": "\uF1D4", "hacker-news": "\uF1D4", "tencent-weibo": "\uF1D5", "qq": "\uF1D6", "wechat": "\uF1D7", "weixin": "\uF1D7", "send": "\uF1D8", "paper-plane": "\uF1D8", "send-o": "\uF1D9", "paper-plane-o": "\uF1D9", "history": "\uF1DA", "circle-thin": "\uF1DB", "header": "\uF1DC", "paragraph": "\uF1DD", "sliders": "\uF1DE", "share-alt": "\uF1E0", "share-alt-square": "\uF1E1", "bomb": "\uF1E2", "soccer-ball-o": "\uF1E3", "futbol-o": "\uF1E3", "tty": "\uF1E4", "binoculars": "\uF1E5", "plug": "\uF1E6", "slideshare": "\uF1E7", "twitch": "\uF1E8", "yelp": "\uF1E9", "newspaper-o": "\uF1EA", "wifi": "\uF1EB", "calculator": "\uF1EC", "paypal": "\uF1ED", "google-wallet": "\uF1EE", "cc-visa": "\uF1F0", "cc-mastercard": "\uF1F1", "cc-discover": "\uF1F2", "cc-amex": "\uF1F3", "cc-paypal": "\uF1F4", "cc-stripe": "\uF1F5", "bell-slash": "\uF1F6", "bell-slash-o": "\uF1F7", "trash": "\uF1F8", "copyright": "\uF1F9", "at": "\uF1FA", "eyedropper": "\uF1FB", "paint-brush": "\uF1FC", "birthday-cake": "\uF1FD", "area-chart": "\uF1FE", "pie-chart": "\uF200", "line-chart": "\uF201", "lastfm": "\uF202", "lastfm-square": "\uF203", "toggle-off": "\uF204", "toggle-on": "\uF205", "bicycle": "\uF206", "bus": "\uF207", "ioxhost": "\uF208", "angellist": "\uF209", "cc": "\uF20A", "shekel": "\uF20B", "sheqel": "\uF20B", "ils": "\uF20B", "meanpath": "\uF20C", "buysellads": "\uF20D", "connectdevelop": "\uF20E", "dashcube": "\uF210", "forumbee": "\uF211", "leanpub": "\uF212", "sellsy": "\uF213", "shirtsinbulk": "\uF214", "simplybuilt": "\uF215", "skyatlas": "\uF216", "cart-plus": "\uF217", "cart-arrow-down": "\uF218", "diamond": "\uF219", "ship": "\uF21A", "user-secret": "\uF21B", "motorcycle": "\uF21C", "street-view": "\uF21D", "heartbeat": "\uF21E", "venus": "\uF221", "mars": "\uF222", "mercury": "\uF223", "intersex": "\uF224", "transgender": "\uF224", "transgender-alt": "\uF225", "venus-double": "\uF226", "mars-double": "\uF227", "venus-mars": "\uF228", "mars-stroke": "\uF229", "mars-stroke-v": "\uF22A", "mars-stroke-h": "\uF22B", "neuter": "\uF22C", "genderless": "\uF22D", "facebook-official": "\uF230", "pinterest-p": "\uF231", "whatsapp": "\uF232", "server": "\uF233", "user-plus": "\uF234", "user-times": "\uF235", "hotel": "\uF236", "bed": "\uF236", "viacoin": "\uF237", "train": "\uF238", "subway": "\uF239", "medium": "\uF23A", "yc": "\uF23B", "y-combinator": "\uF23B", "optin-monster": "\uF23C", "opencart": "\uF23D", "expeditedssl": "\uF23E", "battery-4": "\uF240", "battery": "\uF240", "battery-full": "\uF240", "battery-3": "\uF241", "battery-three-quarters": "\uF241", "battery-2": "\uF242", "battery-half": "\uF242", "battery-1": "\uF243", "battery-quarter": "\uF243", "battery-0": "\uF244", "battery-empty": "\uF244", "mouse-pointer": "\uF245", "i-cursor": "\uF246", "object-group": "\uF247", "object-ungroup": "\uF248", "sticky-note": "\uF249", "sticky-note-o": "\uF24A", "cc-jcb": "\uF24B", "cc-diners-club": "\uF24C", "clone": "\uF24D", "balance-scale": "\uF24E", "hourglass-o": "\uF250", "hourglass-1": "\uF251", "hourglass-start": "\uF251", "hourglass-2": "\uF252", "hourglass-half": "\uF252", "hourglass-3": "\uF253", "hourglass-end": "\uF253", "hourglass": "\uF254", "hand-grab-o": "\uF255", "hand-rock-o": "\uF255", "hand-stop-o": "\uF256", "hand-paper-o": "\uF256", "hand-scissors-o": "\uF257", "hand-lizard-o": "\uF258", "hand-spock-o": "\uF259", "hand-pointer-o": "\uF25A", "hand-peace-o": "\uF25B", "trademark": "\uF25C", "registered": "\uF25D", "creative-commons": "\uF25E", "gg": "\uF260", "gg-circle": "\uF261", "tripadvisor": "\uF262", "odnoklassniki": "\uF263", "odnoklassniki-square": "\uF264", "get-pocket": "\uF265", "wikipedia-w": "\uF266", "safari": "\uF267", "chrome": "\uF268", "firefox": "\uF269", "opera": "\uF26A", "internet-explorer": "\uF26B", "tv": "\uF26C", "television": "\uF26C", "contao": "\uF26D", "500px": "\uF26E", "amazon": "\uF270", "calendar-plus-o": "\uF271", "calendar-minus-o": "\uF272", "calendar-times-o": "\uF273", "calendar-check-o": "\uF274", "industry": "\uF275", "map-pin": "\uF276", "map-signs": "\uF277", "map-o": "\uF278", "map": "\uF279", "commenting": "\uF27A", "commenting-o": "\uF27B", "houzz": "\uF27C", "vimeo": "\uF27D", "black-tie": "\uF27E", "fonticons": "\uF280", "reddit-alien": "\uF281", "edge": "\uF282", "credit-card-alt": "\uF283", "codiepie": "\uF284", "modx": "\uF285", "fort-awesome": "\uF286", "usb": "\uF287", "product-hunt": "\uF288", "mixcloud": "\uF289", "scribd": "\uF28A", "pause-circle": "\uF28B", "pause-circle-o": "\uF28C", "stop-circle": "\uF28D", "stop-circle-o": "\uF28E", "shopping-bag": "\uF290", "shopping-basket": "\uF291", "hashtag": "\uF292", "bluetooth": "\uF293", "bluetooth-b": "\uF294", "percent": "\uF295", "gitlab": "\uF296", "wpbeginner": "\uF297", "wpforms": "\uF298", "envira": "\uF299", "universal-access": "\uF29A", "wheelchair-alt": "\uF29B", "question-circle-o": "\uF29C", "blind": "\uF29D", "audio-description": "\uF29E", "volume-control-phone": "\uF2A0", "braille": "\uF2A1", "assistive-listening-systems": "\uF2A2", "asl-interpreting": "\uF2A3", "american-sign-language-interpreting": "\uF2A3", "deafness": "\uF2A4", "hard-of-hearing": "\uF2A4", "deaf": "\uF2A4", "glide": "\uF2A5", "glide-g": "\uF2A6", "signing": "\uF2A7", "sign-language": "\uF2A7", "low-vision": "\uF2A8", "viadeo": "\uF2A9", "viadeo-square": "\uF2AA", "snapchat": "\uF2AB", "snapchat-ghost": "\uF2AC", "snapchat-square": "\uF2AD", "pied-piper": "\uF2AE", "first-order": "\uF2B0", "yoast": "\uF2B1", "themeisle": "\uF2B2", "google-plus-circle": "\uF2B3", "google-plus-official": "\uF2B3", "fa": "\uF2B4", "font-awesome": "\uF2B4", "handshake-o": "\uF2B5", "envelope-open": "\uF2B6", "envelope-open-o": "\uF2B7", "linode": "\uF2B8", "address-book": "\uF2B9", "address-book-o": "\uF2BA", "vcard": "\uF2BB", "address-card": "\uF2BB", "vcard-o": "\uF2BC", "address-card-o": "\uF2BC", "user-circle": "\uF2BD", "user-circle-o": "\uF2BE", "user-o": "\uF2C0", "id-badge": "\uF2C1", "drivers-license": "\uF2C2", "id-card": "\uF2C2", "drivers-license-o": "\uF2C3", "id-card-o": "\uF2C3", "quora": "\uF2C4", "free-code-camp": "\uF2C5", "telegram": "\uF2C6", "thermometer-4": "\uF2C7", "thermometer": "\uF2C7", "thermometer-full": "\uF2C7", "thermometer-3": "\uF2C8", "thermometer-three-quarters": "\uF2C8", "thermometer-2": "\uF2C9", "thermometer-half": "\uF2C9", "thermometer-1": "\uF2CA", "thermometer-quarter": "\uF2CA", "thermometer-0": "\uF2CB", "thermometer-empty": "\uF2CB", "shower": "\uF2CC", "bathtub": "\uF2CD", "s15": "\uF2CD", "bath": "\uF2CD", "podcast": "\uF2CE", "window-maximize": "\uF2D0", "window-minimize": "\uF2D1", "window-restore": "\uF2D2", "times-rectangle": "\uF2D3", "window-close": "\uF2D3", "times-rectangle-o": "\uF2D4", "window-close-o": "\uF2D4", "bandcamp": "\uF2D5", "grav": "\uF2D6", "etsy": "\uF2D7", "imdb": "\uF2D8", "ravelry": "\uF2D9", "eercast": "\uF2DA", "microchip": "\uF2DB", "snowflake-o": "\uF2DC", "superpowers": "\uF2DD", "wpexplorer": "\uF2DE", "meetup": "\uF2E0" };exports.default = _default;
+
+/***/ }),
+
+/***/ 46:
+/*!*********************************************************************************************************!*\
+  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/axios/lib/helpers/buildURL.js ***!
+  \*********************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ./../utils */ 43);
+
+function encode(val) {
+  return encodeURIComponent(val).
+  replace(/%3A/gi, ':').
+  replace(/%24/g, '$').
+  replace(/%2C/gi, ',').
+  replace(/%20/g, '+').
+  replace(/%5B/gi, '[').
+  replace(/%5D/gi, ']');
+}
+
+/**
+   * Build a URL by appending params to the end
+   *
+   * @param {string} url The base of the url (e.g., http://www.google.com)
+   * @param {object} [params] The params to be appended
+   * @returns {string} The formatted url
+   */
+module.exports = function buildURL(url, params, paramsSerializer) {
+  /*eslint no-param-reassign:0*/
+  if (!params) {
+    return url;
+  }
+
+  var serializedParams;
+  if (paramsSerializer) {
+    serializedParams = paramsSerializer(params);
+  } else if (utils.isURLSearchParams(params)) {
+    serializedParams = params.toString();
+  } else {
+    var parts = [];
+
+    utils.forEach(params, function serialize(val, key) {
+      if (val === null || typeof val === 'undefined') {
+        return;
+      }
+
+      if (utils.isArray(val)) {
+        key = key + '[]';
+      } else {
+        val = [val];
+      }
+
+      utils.forEach(val, function parseValue(v) {
+        if (utils.isDate(v)) {
+          v = v.toISOString();
+        } else if (utils.isObject(v)) {
+          v = JSON.stringify(v);
+        }
+        parts.push(encode(key) + '=' + encode(v));
+      });
+    });
+
+    serializedParams = parts.join('&');
+  }
+
+  if (serializedParams) {
+    var hashmarkIndex = url.indexOf('#');
+    if (hashmarkIndex !== -1) {
+      url = url.slice(0, hashmarkIndex);
+    }
+
+    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
+  }
+
+  return url;
+};
+
+/***/ }),
+
+/***/ 47:
+/*!****************************************************************************************************************!*\
+  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/axios/lib/core/InterceptorManager.js ***!
+  \****************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ./../utils */ 43);
+
+function InterceptorManager() {
+  this.handlers = [];
+}
+
+/**
+   * Add a new interceptor to the stack
+   *
+   * @param {Function} fulfilled The function to handle `then` for a `Promise`
+   * @param {Function} rejected The function to handle `reject` for a `Promise`
+   *
+   * @return {Number} An ID used to remove interceptor later
+   */
+InterceptorManager.prototype.use = function use(fulfilled, rejected) {
+  this.handlers.push({
+    fulfilled: fulfilled,
+    rejected: rejected });
+
+  return this.handlers.length - 1;
+};
+
+/**
+    * Remove an interceptor from the stack
+    *
+    * @param {Number} id The ID that was returned by `use`
+    */
+InterceptorManager.prototype.eject = function eject(id) {
+  if (this.handlers[id]) {
+    this.handlers[id] = null;
+  }
+};
+
+/**
+    * Iterate over all the registered interceptors
+    *
+    * This method is particularly useful for skipping over any
+    * interceptors that may have become `null` calling `eject`.
+    *
+    * @param {Function} fn The function to call for each interceptor
+    */
+InterceptorManager.prototype.forEach = function forEach(fn) {
+  utils.forEach(this.handlers, function forEachHandler(h) {
+    if (h !== null) {
+      fn(h);
+    }
+  });
+};
+
+module.exports = InterceptorManager;
+
+/***/ }),
+
+/***/ 472:
+/*!********************************************************************************************!*\
+  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/components/uni-icons/icons.js ***!
+  \********************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = {
+  'contact': "\uE100",
+  'person': "\uE101",
+  'personadd': "\uE102",
+  'contact-filled': "\uE130",
+  'person-filled': "\uE131",
+  'personadd-filled': "\uE132",
+  'phone': "\uE200",
+  'email': "\uE201",
+  'chatbubble': "\uE202",
+  'chatboxes': "\uE203",
+  'phone-filled': "\uE230",
+  'email-filled': "\uE231",
+  'chatbubble-filled': "\uE232",
+  'chatboxes-filled': "\uE233",
+  'weibo': "\uE260",
+  'weixin': "\uE261",
+  'pengyouquan': "\uE262",
+  'chat': "\uE263",
+  'qq': "\uE264",
+  'videocam': "\uE300",
+  'camera': "\uE301",
+  'mic': "\uE302",
+  'location': "\uE303",
+  'mic-filled': "\uE332",
+  'speech': "\uE332",
+  'location-filled': "\uE333",
+  'micoff': "\uE360",
+  'image': "\uE363",
+  'map': "\uE364",
+  'compose': "\uE400",
+  'trash': "\uE401",
+  'upload': "\uE402",
+  'download': "\uE403",
+  'close': "\uE404",
+  'redo': "\uE405",
+  'undo': "\uE406",
+  'refresh': "\uE407",
+  'star': "\uE408",
+  'plus': "\uE409",
+  'minus': "\uE410",
+  'circle': "\uE411",
+  'checkbox': "\uE411",
+  'close-filled': "\uE434",
+  'clear': "\uE434",
+  'refresh-filled': "\uE437",
+  'star-filled': "\uE438",
+  'plus-filled': "\uE439",
+  'minus-filled': "\uE440",
+  'circle-filled': "\uE441",
+  'checkbox-filled': "\uE442",
+  'closeempty': "\uE460",
+  'refreshempty': "\uE461",
+  'reload': "\uE462",
+  'starhalf': "\uE463",
+  'spinner': "\uE464",
+  'spinner-cycle': "\uE465",
+  'search': "\uE466",
+  'plusempty': "\uE468",
+  'forward': "\uE470",
+  'back': "\uE471",
+  'left-nav': "\uE471",
+  'checkmarkempty': "\uE472",
+  'home': "\uE500",
+  'navigate': "\uE501",
+  'gear': "\uE502",
+  'paperplane': "\uE503",
+  'info': "\uE504",
+  'help': "\uE505",
+  'locked': "\uE506",
+  'more': "\uE507",
+  'flag': "\uE508",
+  'home-filled': "\uE530",
+  'gear-filled': "\uE532",
+  'info-filled': "\uE534",
+  'help-filled': "\uE535",
+  'more-filled': "\uE537",
+  'settings': "\uE560",
+  'list': "\uE562",
+  'bars': "\uE563",
+  'loop': "\uE565",
+  'paperclip': "\uE567",
+  'eye': "\uE568",
+  'arrowup': "\uE580",
+  'arrowdown': "\uE581",
+  'arrowleft': "\uE582",
+  'arrowright': "\uE583",
+  'arrowthinup': "\uE584",
+  'arrowthindown': "\uE585",
+  'arrowthinleft': "\uE586",
+  'arrowthinright': "\uE587",
+  'pulldown': "\uE588",
+  'closefill': "\uE589",
+  'sound': "\uE590",
+  'scan': "\uE612" };exports.default = _default;
+
+/***/ }),
+
+/***/ 48:
+/*!*************************************************************************************************************!*\
+  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/axios/lib/core/dispatchRequest.js ***!
+  \*************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ./../utils */ 43);
+var transformData = __webpack_require__(/*! ./transformData */ 49);
+var isCancel = __webpack_require__(/*! ../cancel/isCancel */ 50);
+var defaults = __webpack_require__(/*! ../defaults */ 51);
+
+/**
+                                        * Throws a `Cancel` if cancellation has been requested.
+                                        */
+function throwIfCancellationRequested(config) {
+  if (config.cancelToken) {
+    config.cancelToken.throwIfRequested();
+  }
+}
+
+/**
+   * Dispatch a request to the server using the configured adapter.
+   *
+   * @param {object} config The config that is to be used for the request
+   * @returns {Promise} The Promise to be fulfilled
+   */
+module.exports = function dispatchRequest(config) {
+  throwIfCancellationRequested(config);
+
+  // Ensure headers exist
+  config.headers = config.headers || {};
+
+  // Transform request data
+  config.data = transformData(
+  config.data,
+  config.headers,
+  config.transformRequest);
+
+
+  // Flatten headers
+  config.headers = utils.merge(
+  config.headers.common || {},
+  config.headers[config.method] || {},
+  config.headers);
+
+
+  utils.forEach(
+  ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
+  function cleanHeaderConfig(method) {
+    delete config.headers[method];
+  });
+
+
+  var adapter = config.adapter || defaults.adapter;
+
+  return adapter(config).then(function onAdapterResolution(response) {
+    throwIfCancellationRequested(config);
+
+    // Transform response data
+    response.data = transformData(
+    response.data,
+    response.headers,
+    config.transformResponse);
+
+
+    return response;
+  }, function onAdapterRejection(reason) {
+    if (!isCancel(reason)) {
+      throwIfCancellationRequested(config);
+
+      // Transform response data
+      if (reason && reason.response) {
+        reason.response.data = transformData(
+        reason.response.data,
+        reason.response.headers,
+        config.transformResponse);
+
+      }
+    }
+
+    return Promise.reject(reason);
+  });
+};
+
+/***/ }),
+
+/***/ 49:
+/*!***********************************************************************************************************!*\
+  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/axios/lib/core/transformData.js ***!
+  \***********************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var utils = __webpack_require__(/*! ./../utils */ 43);
+
+/**
+                                    * Transform the data for a request or a response
+                                    *
+                                    * @param {Object|String} data The data to be transformed
+                                    * @param {Array} headers The headers for the request or response
+                                    * @param {Array|Function} fns A single function or Array of functions
+                                    * @returns {*} The resulting transformed data
+                                    */
+module.exports = function transformData(data, headers, fns) {
+  /*eslint no-param-reassign:0*/
+  utils.forEach(fns, function transform(fn) {
+    data = fn(data, headers);
+  });
+
+  return data;
+};
+
+/***/ }),
+
+/***/ 494:
 /*!**********************************************************************************************!*\
   !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/components/pcaPicker/pcaData.js ***!
   \**********************************************************************************************/
@@ -17974,271 +18349,6 @@ module.exports = {
 
 /***/ }),
 
-/***/ 46:
-/*!*********************************************************************************************************!*\
-  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/axios/lib/helpers/buildURL.js ***!
-  \*********************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ 43);
-
-function encode(val) {
-  return encodeURIComponent(val).
-  replace(/%3A/gi, ':').
-  replace(/%24/g, '$').
-  replace(/%2C/gi, ',').
-  replace(/%20/g, '+').
-  replace(/%5B/gi, '[').
-  replace(/%5D/gi, ']');
-}
-
-/**
-   * Build a URL by appending params to the end
-   *
-   * @param {string} url The base of the url (e.g., http://www.google.com)
-   * @param {object} [params] The params to be appended
-   * @returns {string} The formatted url
-   */
-module.exports = function buildURL(url, params, paramsSerializer) {
-  /*eslint no-param-reassign:0*/
-  if (!params) {
-    return url;
-  }
-
-  var serializedParams;
-  if (paramsSerializer) {
-    serializedParams = paramsSerializer(params);
-  } else if (utils.isURLSearchParams(params)) {
-    serializedParams = params.toString();
-  } else {
-    var parts = [];
-
-    utils.forEach(params, function serialize(val, key) {
-      if (val === null || typeof val === 'undefined') {
-        return;
-      }
-
-      if (utils.isArray(val)) {
-        key = key + '[]';
-      } else {
-        val = [val];
-      }
-
-      utils.forEach(val, function parseValue(v) {
-        if (utils.isDate(v)) {
-          v = v.toISOString();
-        } else if (utils.isObject(v)) {
-          v = JSON.stringify(v);
-        }
-        parts.push(encode(key) + '=' + encode(v));
-      });
-    });
-
-    serializedParams = parts.join('&');
-  }
-
-  if (serializedParams) {
-    var hashmarkIndex = url.indexOf('#');
-    if (hashmarkIndex !== -1) {
-      url = url.slice(0, hashmarkIndex);
-    }
-
-    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
-  }
-
-  return url;
-};
-
-/***/ }),
-
-/***/ 47:
-/*!****************************************************************************************************************!*\
-  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/axios/lib/core/InterceptorManager.js ***!
-  \****************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ 43);
-
-function InterceptorManager() {
-  this.handlers = [];
-}
-
-/**
-   * Add a new interceptor to the stack
-   *
-   * @param {Function} fulfilled The function to handle `then` for a `Promise`
-   * @param {Function} rejected The function to handle `reject` for a `Promise`
-   *
-   * @return {Number} An ID used to remove interceptor later
-   */
-InterceptorManager.prototype.use = function use(fulfilled, rejected) {
-  this.handlers.push({
-    fulfilled: fulfilled,
-    rejected: rejected });
-
-  return this.handlers.length - 1;
-};
-
-/**
-    * Remove an interceptor from the stack
-    *
-    * @param {Number} id The ID that was returned by `use`
-    */
-InterceptorManager.prototype.eject = function eject(id) {
-  if (this.handlers[id]) {
-    this.handlers[id] = null;
-  }
-};
-
-/**
-    * Iterate over all the registered interceptors
-    *
-    * This method is particularly useful for skipping over any
-    * interceptors that may have become `null` calling `eject`.
-    *
-    * @param {Function} fn The function to call for each interceptor
-    */
-InterceptorManager.prototype.forEach = function forEach(fn) {
-  utils.forEach(this.handlers, function forEachHandler(h) {
-    if (h !== null) {
-      fn(h);
-    }
-  });
-};
-
-module.exports = InterceptorManager;
-
-/***/ }),
-
-/***/ 48:
-/*!*************************************************************************************************************!*\
-  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/axios/lib/core/dispatchRequest.js ***!
-  \*************************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ 43);
-var transformData = __webpack_require__(/*! ./transformData */ 49);
-var isCancel = __webpack_require__(/*! ../cancel/isCancel */ 50);
-var defaults = __webpack_require__(/*! ../defaults */ 51);
-
-/**
-                                        * Throws a `Cancel` if cancellation has been requested.
-                                        */
-function throwIfCancellationRequested(config) {
-  if (config.cancelToken) {
-    config.cancelToken.throwIfRequested();
-  }
-}
-
-/**
-   * Dispatch a request to the server using the configured adapter.
-   *
-   * @param {object} config The config that is to be used for the request
-   * @returns {Promise} The Promise to be fulfilled
-   */
-module.exports = function dispatchRequest(config) {
-  throwIfCancellationRequested(config);
-
-  // Ensure headers exist
-  config.headers = config.headers || {};
-
-  // Transform request data
-  config.data = transformData(
-  config.data,
-  config.headers,
-  config.transformRequest);
-
-
-  // Flatten headers
-  config.headers = utils.merge(
-  config.headers.common || {},
-  config.headers[config.method] || {},
-  config.headers);
-
-
-  utils.forEach(
-  ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
-  function cleanHeaderConfig(method) {
-    delete config.headers[method];
-  });
-
-
-  var adapter = config.adapter || defaults.adapter;
-
-  return adapter(config).then(function onAdapterResolution(response) {
-    throwIfCancellationRequested(config);
-
-    // Transform response data
-    response.data = transformData(
-    response.data,
-    response.headers,
-    config.transformResponse);
-
-
-    return response;
-  }, function onAdapterRejection(reason) {
-    if (!isCancel(reason)) {
-      throwIfCancellationRequested(config);
-
-      // Transform response data
-      if (reason && reason.response) {
-        reason.response.data = transformData(
-        reason.response.data,
-        reason.response.headers,
-        config.transformResponse);
-
-      }
-    }
-
-    return Promise.reject(reason);
-  });
-};
-
-/***/ }),
-
-/***/ 49:
-/*!***********************************************************************************************************!*\
-  !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/axios/lib/core/transformData.js ***!
-  \***********************************************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var utils = __webpack_require__(/*! ./../utils */ 43);
-
-/**
-                                    * Transform the data for a request or a response
-                                    *
-                                    * @param {Object|String} data The data to be transformed
-                                    * @param {Array} headers The headers for the request or response
-                                    * @param {Array|Function} fns A single function or Array of functions
-                                    * @returns {*} The resulting transformed data
-                                    */
-module.exports = function transformData(data, headers, fns) {
-  /*eslint no-param-reassign:0*/
-  utils.forEach(fns, function transform(fn) {
-    data = fn(data, headers);
-  });
-
-  return data;
-};
-
-/***/ }),
-
 /***/ 50:
 /*!********************************************************************************************************!*\
   !*** C:/Users/Administrator/Documents/HBuilderProjects/shop/node_modules/axios/lib/cancel/isCancel.js ***!
@@ -19606,8 +19716,10 @@ module.exports = function isAxiosError(payload) {
 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = {
-  baseUrl: 'http://192.168.1.5/shop/admin',
+  // baseUrl: 'http://192.168.1.5/shop/admin',
+  baseUrl: 'https://fzshop.5laoye.com/api',
   login: '/login', //登录
+  app_wxlogin: "/app_wxlogin", //APP端登录
   logincheck: '/logincheck', //后台登录状态检测
   wx_login: '/wx_login', //小程序端微信登录
   wx_userinfo: '/wx_userinfo', //小程序端用户信息
@@ -19649,7 +19761,12 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
   wx_mycollectdel: '/wx_mycollectdel', //小程序端取消收藏
   wx_withdrawal: '/wx_withdrawal', //小程序端提现提交
   wx_mywithdrawal: '/wx_mywithdrawal', //小程序端提现列表
-  wx_mycollect: '/wx_mycollect' //小程序端我的收藏
+  wx_mycollect: '/wx_mycollect', //小程序端我的收藏
+  wx_userrecommend: '/wx_userrecommend', //小程序端邀请好友触发
+  wx_usertopcommission: '/wx_usertopcommission', //小程序端最新10条邀请好友记录
+  wx_sharetouserid: '/wx_sharetouserid', //分享好友和朋友圈返回相对应的用户ID
+  wx_loginuserinfo: '/wx_loginuserinfo', //小程序端获取微信昵称和头像
+  app_upgrade: '/app_upgrade' //APP端升级检测
 };exports.default = _default;
 
 /***/ }),

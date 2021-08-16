@@ -8,11 +8,11 @@
 		<view class="nav-1">
 			<view class="nav-item">
 				<view>综合</view>
-				<image src="/static/路径181.png" mode=""></image>
+				<image src="/static/lujin181.png" mode=""></image>
 				<view>价格升序</view>
-				<image src="/static/路径181.png" mode=""></image>
+				<image src="/static/lujin181.png" mode=""></image>
 				<view>价格降序</view>
-				<image src="/static/路径181.png" mode=""></image>
+				<image src="/static/lujin181.png" mode=""></image>
 			</view>
 		</view>
 		<view class="items">
@@ -23,8 +23,8 @@
 				</view>
 				<view class="tit-footer">
 					<view class="price">￥{{item.price}}</view>
-					<image class="pic1" src="/static/组15.png" mode=""></image>
-					<image class="pic2" src="/static/组48.png" mode=""></image>
+					<image class="pic1" src="/static/zu15.png" mode=""></image>
+					<image class="pic2" src="/static/zu48.png" mode=""></image>
 				</view>
 			</view>
 		</view>

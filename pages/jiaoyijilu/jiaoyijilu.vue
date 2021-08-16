@@ -20,7 +20,7 @@
 										<view class="tit3">余额：{{item.user_balance}}</view>
 									</view>
 									<view class="nav2" v-for="(ele,index) in item.goods" :key='index'>
-										<image class="pic1" :src="ele.goods_pic" mode=""></image>
+										<image class="pic1" @click=toxiangqin(ele) :src="ele.goods_pic" mode=""></image>
 										<view class="title">
 											<view class="tit1">
 												<view class="tit1-1">{{ele.goods_title}}</view>
@@ -45,7 +45,7 @@
 										<view class="tit3">余额：{{item.user_balance}}</view>
 									</view>
 									<view class="nav2" v-for="(ele,index) in item.goods" :key='index'>
-										<image class="pic1" :src="ele.goods_pic" mode=""></image>
+										<image class="pic1" @click=toxiangqin(ele) :src="ele.goods_pic" mode=""></image>
 										<view class="title">
 											<view class="tit1">
 												<view class="tit1-1">{{ele.goods_title}}</view>
@@ -67,7 +67,7 @@
 										<view class="tit3">余额：{{item.user_balance}}</view>
 									</view>
 									<view class="nav2" v-for="(ele,index) in item.goods" :key='index'>
-										<image class="pic1" :src="ele.goods_pic" mode=""></image>
+										<image class="pic1" @click=toxiangqin(ele) :src="ele.goods_pic" mode=""></image>
 										<view class="title">
 											<view class="tit1">
 												<view class="tit1-1">{{ele.goods_title}}</view>
@@ -89,7 +89,7 @@
 										<view class="tit3">余额：{{item.user_balance}}</view>
 									</view>
 									<view class="nav2" v-for="(ele,index) in item.goods" :key='index'>
-										<image class="pic1" :src="ele.goods_pic" mode=""></image>
+										<image class="pic1" @click=toxiangqin(ele) :src="ele.goods_pic" mode=""></image>
 										<view class="title">
 											<view class="tit1">
 												<view class="tit1-1">{{ele.goods_title}}</view>
@@ -111,7 +111,7 @@
 										<view class="tit3">余额：{{item.user_balance}}</view>
 									</view>
 									<view class="nav2" v-for="(ele,index) in item.goods" :key='index'>
-										<image class="pic1" :src="ele.goods_pic" mode=""></image>
+										<image class="pic1" @click=toxiangqin(ele) :src="ele.goods_pic" mode=""></image>
 										<view class="title">
 											<view class="tit1">
 												<view class="tit1-1">{{ele.goods_title}}</view>
@@ -133,7 +133,7 @@
 										<view class="tit3">余额：{{item.user_balance}}</view>
 									</view>
 									<view class="nav2" v-for="(ele,index) in item.goods" :key='index'>
-										<image class="pic1" :src="ele.goods_pic" mode=""></image>
+										<image class="pic1" @click=toxiangqin(ele) :src="ele.goods_pic" mode=""></image>
 										<view class="title">
 											<view class="tit1">
 												<view class="tit1-1">{{ele.goods_title}}</view>
@@ -155,7 +155,7 @@
 										<view class="tit3">余额：{{item.user_balance}}</view>
 									</view>
 									<view class="nav2" v-for="(ele,index) in item.goods" :key='index'>
-										<image class="pic1" :src="ele.goods_pic" mode=""></image>
+										<image class="pic1" @click=toxiangqin(ele) :src="ele.goods_pic" mode=""></image>
 										<view class="title">
 											<view class="tit1">
 												<view class="tit1-1">{{ele.goods_title}}</view>
@@ -177,7 +177,7 @@
 										<view class="tit3">余额：{{item.user_balance}}</view>
 									</view>
 									<view class="nav2" v-for="(ele,index) in item.goods" :key='index'>
-										<image class="pic1" :src="ele.goods_pic" mode=""></image>
+										<image class="pic1" @click=toxiangqin(ele) :src="ele.goods_pic" mode=""></image>
 										<view class="title">
 											<view class="tit1">
 												<view class="tit1-1">{{ele.goods_title}}</view>
@@ -199,7 +199,7 @@
 										<view class="tit3">余额：{{item.user_balance}}</view>
 									</view>
 									<view class="nav2" v-for="(ele,index) in item.goods" :key='index'>
-										<image class="pic1" :src="ele.goods_pic" mode=""></image>
+										<image class="pic1" @click=toxiangqin(ele) :src="ele.goods_pic" mode=""></image>
 										<view class="title">
 											<view class="tit1">
 												<view class="tit1-1">{{ele.goods_title}}</view>
@@ -221,7 +221,7 @@
 										<view class="tit3">余额：{{item.user_balance}}</view>
 									</view>
 									<view class="nav2" v-for="(ele,index) in item.goods" :key='index'>
-										<image class="pic1" :src="ele.goods_pic" mode=""></image>
+										<image class="pic1" @click=toxiangqin(ele) :src="ele.goods_pic" mode=""></image>
 										<view class="title">
 											<view class="tit1">
 												<view class="tit1-1">{{ele.goods_title}}</view>
@@ -243,7 +243,7 @@
 										<view class="tit3">余额：{{item.user_balance}}</view>
 									</view>
 									<view class="nav2" v-for="(ele,index) in item.goods" :key='index'>
-										<image class="pic1" :src="ele.goods_pic" mode=""></image>
+										<image class="pic1" @click=toxiangqin(ele) :src="ele.goods_pic" mode=""></image>
 										<view class="title">
 											<view class="tit1">
 												<view class="tit1-1">{{ele.goods_title}}</view>
@@ -265,7 +265,7 @@
 										<view class="tit3">余额：{{item.user_balance}}</view>
 									</view>
 									<view class="nav2" v-for="(ele,index) in item.goods" :key='index'>
-										<image class="pic1" :src="ele.goods_pic" mode=""></image>
+										<image class="pic1" @click=toxiangqin(ele) :src="ele.goods_pic" mode=""></image>
 										<view class="title">
 											<view class="tit1">
 												<view class="tit1-1">{{ele.goods_title}}</view>
@@ -448,6 +448,13 @@
 				setTimeout(() => {
 					this.getCurrentSwiperHeight('.items');
 				}, 500)
+			},
+			// 点击图片跳转至购物车
+			toxiangqin(item) {
+				console.log(item)
+				uni.navigateTo({
+					url: `/pages/shangpinxiangqin/shangpinxiangqin?id=${item.goods_id}`
+				})
 			},
 			lower() {
 				console.log('bottom', this.yyjlPage, this.height)

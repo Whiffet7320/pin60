@@ -1,19 +1,23 @@
 <template>
 	<view class="index">
 		<view class="banner">
-			<image src="../../static/hongbaobanner.png" class="nav-banner"></image>
-			<image @click="toBack" src="../../static/路径18.png" class="fanhui"></image>
+			<image src="/static/6banner.png" class="nav-banner"></image>
+			<image @click="toBack" src="/static/lujin18.png" class="fanhui"></image>
+			<image class="banPic" src="/static/Group.png" mode=""></image>
+			<text class="tit1">周州粥发出的红包</text>
+			<text class="tit2">恭喜发财，大吉大利</text>
+			<text class="tit3">已存入余额，可直接提现 ></text>
 		</view>
-		<view class="center">
-			<image src="../../static/矩形147.png" class="juxin"></image>
-			<image src="../../static/Group.png" class="pic"></image>
+<!-- 		<view class="center">
+			<image src="/static/juxin147.png" class="juxin"></image>
+			<image src="/static/Group.png" class="pic"></image>
 			<text class="tit1">周州粥发出的红包</text>
 			<text class="tit2">恭喜发财，大吉大利</text>
 			<text class="tit3">0.04元</text>
 			<text class="tit4">已存入余额，可直接提现></text>
-		</view>
+		</view> -->
 		<view class="footer">
-			<view class="tit11">领取5/5个</view>
+			<view class="tit11">领取{{list.length}}/5个</view>
 			<view class="items">
 				<view class="item" v-for="(item,i) in list">
 					<view class="item-left">
@@ -34,7 +38,7 @@
 							{{item.free_money}}元
 						</view>
 						<view class="mian">
-							<image v-if="item.free_money != 0" src="/static/免.png"></image>
+							<image v-if="item.free_money != 0" src="/static/mian.png"></image>
 						</view>
 					</view>
 
@@ -56,7 +60,7 @@
 		async onShow() {
 			const res = await this.$api.wx_freeorder(this.openid, this.sub_orderid)
 			console.log(res)
-			this.list = res.list
+			this.list = res.list;
 		},
 		data() {
 			return {
@@ -81,14 +85,14 @@
 <style scoped lang="scss">
 	.index {
 		.banner {
-			width: calc(1.82 * 414rpx);
-			height: calc(1.82 * 172rpx);
-			opacity: 1;
 			position: relative;
-
 			.nav-banner {
-				width: 100%;
-				height: 100%;
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 750rpx;
+				height: 493rpx;
+				opacity: 1;
 				position: absolute;
 			}
 
@@ -98,6 +102,50 @@
 				margin-top: calc(1.82 * 48rpx);
 				margin-left: calc(1.82 * 27rpx);
 				opacity: 1;
+			}
+			.banPic{
+				position: absolute;
+				top: 87rpx;
+				left: 317rpx;
+				width: 118rpx;
+				height: 118rpx;
+				opacity: 1;
+			}
+			.tit1{
+				position: absolute;
+				top: 232rpx;
+				left: 50%;
+				transform: translateX(-50%);
+				opacity: 1;
+				font-size: 27rpx;
+				font-family: PingFang SC, PingFang SC-Bold;
+				font-weight: 700;
+				color: #ffffff;
+				letter-spacing: 2rpx;
+			}
+			.tit2{
+				position: absolute;
+				top: 286rpx;
+				left: 50%;
+				transform: translateX(-50%);
+				opacity: 1;
+				font-size: 18rpx;
+				font-family: SourceHanSansCN-Regular;
+				text-align: center;
+				color: #ffffff;
+				letter-spacing: 0rpx;
+			}
+			.tit3{
+				position: absolute;
+				top: 353rpx;
+				left: 50%;
+				transform: translateX(-50%);
+				opacity: 1;
+				font-size: 18rpx;
+				font-family: SourceHanSansCN-Regular;
+				color: #ffffff;
+				line-height: 31rpx;
+				letter-spacing: 0rpx;
 			}
 		}
 
@@ -185,7 +233,7 @@
 		.footer {
 			margin-left: 50%;
 			transform: translateX(-50%);
-			margin-top: calc(1.82 * 233rpx);
+			margin-top: 270rpx;
 			// border: 2rpx solid red;
 			width: calc(1.82 * 374rpx);
 			height: calc(1.82 * 458rpx);
@@ -258,6 +306,7 @@
 
 					.item-right {
 						display: flex;
+
 						.tit3 {
 							opacity: 1;
 							font-size: 18rpx;

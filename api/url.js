@@ -1,6 +1,8 @@
 export default {
-    baseUrl: 'http://192.168.1.5/shop/admin',
+    // baseUrl: 'http://192.168.1.5/shop/admin',
+	baseUrl:'https://fzshop.5laoye.com/api',
     login: '/login', //登录
+	app_wxlogin:"/app_wxlogin",//APP端登录
     logincheck: '/logincheck', //后台登录状态检测
     wx_login:'/wx_login',//小程序端微信登录
 	wx_userinfo:'/wx_userinfo',//小程序端用户信息
@@ -43,4 +45,9 @@ export default {
 	wx_withdrawal:'/wx_withdrawal',//小程序端提现提交
 	wx_mywithdrawal:'/wx_mywithdrawal',//小程序端提现列表
 	wx_mycollect:'/wx_mycollect',//小程序端我的收藏
+	wx_userrecommend:'/wx_userrecommend',//小程序端邀请好友触发
+	wx_usertopcommission:'/wx_usertopcommission',//小程序端最新10条邀请好友记录
+	wx_sharetouserid:'/wx_sharetouserid',//分享好友和朋友圈返回相对应的用户ID
+	wx_loginuserinfo:'/wx_loginuserinfo',//小程序端获取微信昵称和头像
+	app_upgrade:'/app_upgrade',//APP端升级检测
 }

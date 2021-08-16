@@ -8,18 +8,19 @@
 			<image v-if="user.facepic" class="pic" :src="user.facepic" mode=""></image>
 			<image v-else class="pic" src="/static/Group.png" mode=""></image>
 			<view v-if="user.nickname" class="tit" @tap="toLogin">{{user.nickname}}</view>
-			<view v-else class="tit" @tap="toLogin">登录/注册</view>
+			<view v-else class="tit" @tap="toLogin">点击登录</view>
+			<view v-if="user.nickname" style="color: #DD6161;" class="tit" @tap="tcLogin">退出登录</view>
 		</view>
 		<view class="nav3">
 			<view class="btn1" @tap="toJiaoyijilu">
-				<image class="pic" src="/static/蒙版组25@2x.png" mode=""></image>
+				<image class="pic" src="/static/mcz25@2x.png" mode=""></image>
 				<view class="tit1">余额</view>
-				<view class="tit2">{{user.money}}</view>
+				<view class="tit2">￥{{user.money}}</view>
 			</view>
 			<view class="btn2" @tap="toYongjinxiangqin">
-				<image class="pic" src="/static/蒙版组26@2x.png" mode=""></image>
+				<image class="pic" src="/static/mcz26@2x.png" mode=""></image>
 				<view class="tit1">佣金</view>
-				<view class="tit2">{{user.commission_money}}</view>
+				<view class="tit2">￥{{user.commission_money}}</view>
 			</view>
 		</view>
 		<view class="nav4">
@@ -36,19 +37,19 @@
 			<view class="tit1">我的订单</view>
 			<view class="items">
 				<view class="item" @tap="toQuanbudingdan(-1)">
-					<image class="pic" src="/static/组173.png" mode=""></image>
+					<image class="pic" src="/static/zu715.png" mode=""></image>
 					<view class="tit">全部订单</view>
 				</view>
 				<view class="item" @tap="toQuanbudingdan(0)">
-					<image class="pic" src="/static/组46.png" mode=""></image>
+					<image class="pic" src="/static/zu716.png" mode=""></image>
 					<view class="tit">待付款</view>
 				</view>
 				<view class="item" @tap="toQuanbudingdan(1)">
-					<image class="pic" src="/static/路径158.png" mode=""></image>
+					<image class="pic" src="/static/zu717.png" mode=""></image>
 					<view class="tit">待发货</view>
 				</view>
-				<view class="item2" @tap="toQuanbudingdan(2)">
-					<image class="pic" src="/static/组47.png" mode=""></image>
+				<view class="item" @tap="toQuanbudingdan(2)">
+					<image class="pic" src="/static/zu718.png" mode=""></image>
 					<view class="tit">待收货</view>
 				</view>
 			</view>
@@ -58,24 +59,25 @@
 			<view class="tit1">常用功能</view>
 			<view class="items">
 				<view class="item" @click="toshoucang">
-					<image class="pic" src="/static/路径180.png" mode=""></image>
+					<image class="pic" src="/static/zu722.png" mode=""></image>
 					<view class="tit">我的收藏</view>
 				</view>
 				<button open-type="contact" bindcontact="handleContact" class="item kf">
-					<image class="pic" src="/static/路径162.png" mode=""></image>
+					<image class="pic" src="/static/zu721.png" mode=""></image>
 					<view class="tit">联系客服</view>
 				</button>
 				<view class="item" @click="toxinshouzhinan">
-					<image class="pic" src="/static/ic_notification.png" mode=""></image>
+					<image class="pic" src="/static/zu720.png" mode=""></image>
 					<view class="tit">新手指南</view>
 				</view>
 				<view class="item" @click="toShouhuo">
-					<image class="pic" src="/static/shouhuo.png" mode=""></image>
+					<image class="pic" src="/static/zu719.png" mode=""></image>
 					<view class="tit">收货信息</view>
 				</view>
 			</view>
 		</view>
-
+		<u-tabbar height=98 active-color="#EBBFCC" mid-button-size=39 v-model="current" :list="tabbarlist"
+			:mid-button="true"></u-tabbar>
 
 	</view>
 </template>
@@ -87,7 +89,58 @@
 				userName: null,
 				avatarUrl: null,
 				openid: null,
-				user: null,
+				user: {},
+				tabbarlist: [{
+						iconPath: "/static/shouye.png",
+						selectedIconPath: "/static/shouye-active.png",
+						text: '首页',
+						pagePath: "/pages/index/index"
+					},
+					{
+						iconPath: "/static/miandan.png",
+						selectedIconPath: "/static/miandan-active.png",
+						text: '免单',
+						customIcon: false,
+						pagePath: "/pages/freeCharge/freeCharge"
+					},
+					{
+						iconPath: "/static/zu27.png",
+						selectedIconPath: "static/zu242.png",
+						text: '购物车',
+						customIcon: false,
+						pagePath: "/pages/gouwuche/gouwuche"
+					},
+					{
+						midButton: true,
+						iconPath: "/static/zu243.png",
+						selectedIconPath: "/static/zu245.png",
+						text: '我的',
+						customIcon: false,
+						pagePath: "/pages/wode/wode"
+					},
+				],
+				current: 3
+			}
+		},
+		//用户点击右上角分享转发
+		onShareAppMessage: async function() {
+			const res = await this.$api.wx_sharetouserid(this.openid);
+			console.log(res)
+		
+			var title = '拼60商城app'; //data，return 数据title
+			return {
+				title: title || '',
+				path: `/pages/index/index?scene=0_${res.share_userid}`,
+			}
+		},
+		//用户点击右上角分享朋友圈
+		onShareTimeline:async function() {
+			const res = await this.$api.wx_sharetouserid(this.openid);
+			console.log(res)
+			var title = '拼60商城app'; //data，return 数据title
+			return {
+				title: title || '',
+				path: `/pages/index/index?scene=0_${res.share_userid}`,
 			}
 		},
 		onShow() {
@@ -96,11 +149,12 @@
 		},
 		methods: {
 			async getData() {
-				const res = await this.$api.wx_userinfo(this.openid)
-				console.log(res, 11)
-				this.user = {
-					...res
-				}
+					const res = await this.$api.wx_userinfo(this.openid)
+					console.log(res, 11)
+					this.user = {
+						...res
+					}
+
 			},
 			toShouhuo() {
 				uni.navigateTo({
@@ -109,7 +163,7 @@
 			},
 			toLjitixian() {
 				uni.navigateTo({
-					url: `/pages/wode/lijitixian?withdrawal_money=${this.user.withdrawal_money}`
+					url: `/pages/wode/user/lijitixian?withdrawal_money=${this.user.withdrawal_money}`
 				})
 			},
 			toJiaoyijilu() {
@@ -138,18 +192,23 @@
 			},
 			toxinshouzhinan() {
 				uni.navigateTo({
-					url: "/pages/wode/xinshouzhinan"
+					url: "/pages/wode/user/xinshouzhinan"
 				})
 			},
-			toshoucang(){
+			toshoucang() {
 				uni.navigateTo({
-					url: "/pages/wode/shoucang"
+					url: "/pages/wode/user/shoucang"
 				})
 			},
 			toLogin() {
 				uni.navigateTo({
 					url: '/weixinshouquan/pages/weixinshouquan'
 				})
+			},
+			tcLogin() {
+				uni.clearStorage();
+				this.openid = null;
+				this.getData()
 			},
 		}
 	}
@@ -240,7 +299,7 @@
 				left: 50%;
 				transform: translateX(-50%);
 				opacity: 1;
-				font-size: 18rpx;
+				font-size: 24rpx;
 				font-family: PingFang SC, PingFang SC-Medium;
 				font-weight: 500;
 				text-align: center;
@@ -284,7 +343,7 @@
 				left: 50%;
 				transform: translateX(-50%);
 				opacity: 1;
-				font-size: 18rpx;
+				font-size: 24rpx;
 				font-family: PingFang SC, PingFang SC-Medium;
 				font-weight: 500;
 				text-align: center;
@@ -324,7 +383,7 @@
 				font-size: 18rpx;
 				font-family: PingFang SC, PingFang SC-Medium;
 				font-weight: 500;
-				color: #ebbfcc;
+				color: #000000;
 				margin-top: 6rpx;
 				margin-left: 67rpx;
 			}
@@ -334,7 +393,7 @@
 				font-size: 32rpx;
 				font-family: PingFang SC, PingFang SC-Medium;
 				font-weight: 500;
-				color: #ebbfcc;
+				color: #000000;
 			}
 		}
 
@@ -344,7 +403,7 @@
 			width: 161rpx;
 			height: 58rpx;
 			opacity: 1;
-			border: 2rpx solid #ebbfcc;
+			border: 2rpx solid #000000;
 			border-radius: 25rpx;
 
 			.tit3 {
@@ -354,7 +413,7 @@
 				font-family: PingFang SC, PingFang SC-Bold;
 				font-weight: 700;
 				text-align: center;
-				color: #ebbfcc;
+				color: #000000;
 			}
 		}
 
@@ -370,12 +429,13 @@
 		overflow: hidden;
 
 		.tit1 {
-			margin: 27rpx 0 53rpx 40rpx;
+			margin: 27rpx 0 18rpx 40rpx;
 			opacity: 1;
 			font-size: 34rpx;
 			font-family: SourceHanSansCN-Medium;
 			text-align: left;
 			color: #121314;
+			line-height: 53rpx;
 			letter-spacing: 0rpx;
 		}
 
@@ -383,14 +443,17 @@
 			display: flex;
 			margin: 0 72rpx;
 			justify-content: space-around;
-			.item.kf{
+
+			.item.kf {
 				margin: 0;
 				padding: 0;
 				background-color: #fff;
 			}
-			.item.kf::after{
-			   border: none;
+
+			.item.kf::after {
+				border: none;
 			}
+
 			.item {
 				display: flex;
 				flex-direction: column;
@@ -398,8 +461,8 @@
 
 				// width: 100rpx;
 				.pic {
-					width: 34rpx;
-					height: 38rpx;
+					width: 62rpx;
+					height: 62rpx;
 					opacity: 1;
 				}
 
@@ -437,5 +500,9 @@
 				}
 			}
 		}
+	}
+
+	/deep/ .u-tabbar__content__circle__border {
+		display: none !important;
 	}
 </style>

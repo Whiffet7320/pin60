@@ -3,13 +3,13 @@
 		<!-- <view class="nav">
 			<u-icon @click="goTo" name="arrow-left" size="40"></u-icon>
 			<text class="nav-title">男装专区</text>
-			<image src="../../static/组12.png" class="pic" mode=""></image>
+			<image src="/static/组12.png" class="pic" mode=""></image>
 		</view> -->
 		<view class="nav-footer">
 			<view class="tit1">综合</view>
-			<image src="../../static/组14.png" class="pic1" mode=""></image>
+			<image src="/static/zu14.png" class="pic1" mode=""></image>
 			<view class="tit2"></view>
-			<image src="../../static/组13.png" class="pic2" mode=""></image>
+			<image src="/static/zu13.png" class="pic2" mode=""></image>
 			<view class="tit3"></view>
 			<view class="tit4" @tap="changeShow">筛选</view>
 		</view>
@@ -22,7 +22,7 @@
 					</view>
 					<view class="tit-footer">
 						<view class="price">￥{{item.price}}</view>
-						<image class="pic1" src="../../static/组15.png" mode=""></image>
+						<image class="pic1" src="/static/zu15.png" mode=""></image>
 					</view>
 				</view>
 			</template>

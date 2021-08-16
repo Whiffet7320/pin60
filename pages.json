@@ -34,6 +34,14 @@
 			}
 		},
 		{
+			"path": "pages/freeCharge/miandantwo",
+			"style": {
+				// "navigationStyle": "custom",
+				"navigationBarTitleText": "拼团免单",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
 			"path": "pages/nanzhuanzhuanqu/nanzhuanzhuanqu",
 			"style": {
 				// "navigationStyle": "custom",
@@ -106,45 +114,6 @@
 			}
 		},
 		{
-			"path": "pages/wode/xinshouzhinan",
-			"style": {
-				// "navigationStyle": "custom",
-				"navigationBarTitleText": "新手指南",
-				"enablePullDownRefresh": false
-			}
-		},
-		{
-			"path": "pages/wode/shoucang",
-			"style": {
-				// "navigationStyle": "custom",
-				"navigationBarTitleText": "我的收藏",
-				"enablePullDownRefresh": false
-			}
-		},
-		// {
-		// 	"path": "pages/yaoqinghaoyou/lijitixian",
-		// 	"style": {
-		// 		"navigationStyle": "custom",
-		// 		"navigationBarTitleText": "",
-		// 		"enablePullDownRefresh": false
-		// 	}
-		// },
-		{
-			"path": "pages/wode/lijitixian",
-			"style": {
-				"navigationStyle": "custom",
-				"navigationBarTitleText": "",
-				"enablePullDownRefresh": false
-			}
-		},
-		{
-			"path": "pages/wode/lishijilu",
-			"style": {
-				// "navigationStyle": "custom",
-				"navigationBarTitleText": "历史记录",
-				"enablePullDownRefresh": false
-			}
-		}, {
 			"path": "pages/jiaoyijilu/jiaoyijilu",
 			"style": {
 				// "navigationStyle": "custom",
@@ -159,20 +128,55 @@
 				"navigationBarTitleText": "佣金详情",
 				"enablePullDownRefresh": false
 			}
-
-		},
-		{
-			"path": "pages/wode/lianxikefu",
-			"style": {
-				// "navigationStyle": "custom",
-				"navigationBarTitleText": "联系客服",
-				"enablePullDownRefresh": false
-			}
-
 		}
 
 	],
 	"subPackages": [{
+			"root": "pages/wode/user",
+			"pages": [{
+					"path": "xinshouzhinan",
+					"style": {
+						// "navigationStyle": "custom",
+						"navigationBarTitleText": "新手指南",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "shoucang",
+					"style": {
+						// "navigationStyle": "custom",
+						"navigationBarTitleText": "我的收藏",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "lijitixian",
+					"style": {
+						"navigationStyle": "custom",
+						"navigationBarTitleText": "",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "lishijilu",
+					"style": {
+						// "navigationStyle": "custom",
+						"navigationBarTitleText": "历史记录",
+						"enablePullDownRefresh": false
+					}
+				},
+				{
+					"path": "lianxikefu",
+					"style": {
+						// "navigationStyle": "custom",
+						"navigationBarTitleText": "联系客服",
+						"enablePullDownRefresh": false
+					}
+				
+				}
+			]
+		},
+		{
 			"root": "yaoqinghaoyou",
 			"pages": [{
 					"path": "pages/lijitixian",
@@ -223,9 +227,7 @@
 				"path": "pages/tijiaoshenqing",
 				"style": {
 					"navigationBarTitleText": "申请售后",
-					"enablePullDownRefresh": false,
-					"navigationBarBackgroundColor": "#EBBFCC",
-					"navigationBarTextStyle": "white"
+					"enablePullDownRefresh": false
 				}
 			}, {
 				"path": "pages/pingjia",
@@ -274,25 +276,25 @@
 		"backgroundColor": "#FFFFFF",
 		"borderStyle": "black",
 		"list": [{
-			"pagePath": "pages/index/index",
-			"iconPath": "static/shouye.png",
-			"selectedIconPath": "static/shouye-active.png",
-			"text": "首页"
+			"pagePath": "pages/index/index"
+			// "iconPath": "static/shouye.png",
+			// "selectedIconPath": "static/shouye-active.png",
+			// "text": "首页"
 		}, {
-			"pagePath": "pages/freeCharge/freeCharge",
-			"iconPath": "static/miandan.png",
-			"selectedIconPath": "static/miandan-active.png",
-			"text": "免单"
+			"pagePath": "pages/freeCharge/freeCharge"
+			// "iconPath": "static/miandan.png",
+			// "selectedIconPath": "static/miandan-active.png",
+			// "text": "免单"
 		}, {
-			"pagePath": "pages/gouwuche/gouwuche",
-			"iconPath": "static/组27.png",
-			"selectedIconPath": "static/组242.png",
-			"text": "购物车"
+			"pagePath": "pages/gouwuche/gouwuche"
+			// "iconPath": "static/zu27.png",
+			// "selectedIconPath": "static/zu242.png",
+			// "text": "购物车"
 		}, {
-			"pagePath": "pages/wode/wode",
-			"iconPath": "static/组243.png",
-			"selectedIconPath": "static/组245.png",
-			"text": "我的"
+			"pagePath": "pages/wode/wode"
+			// "iconPath": "static/zu243.png",
+			// "selectedIconPath": "static/zu245.png",
+			// "text": "我的"
 		}]
 	}
 }

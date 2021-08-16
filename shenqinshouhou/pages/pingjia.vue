@@ -36,7 +36,7 @@
 						type: 'success',
 						duration: 500,
 						back :true
-						// url: `/wodeQuanbudingdan/pages/quanbudingdan?orders_status=3`,
+						// url: `/pages/wodeQuanbudingdan/pages/quanbudingdan?orders_status=3`,
 					})
 				} else {
 					this.$refs.uToast.show({

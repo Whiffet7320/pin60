@@ -78,7 +78,8 @@
   margin-left: 78rpx;
 }
 .evan-step__line {
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 .evan-step__line--vertical {
   position: absolute;
@@ -140,7 +141,8 @@
   display: -webkit-box;
   display: -webkit-flex;
   display: flex;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
   -webkit-box-align: center;
   -webkit-align-items: center;
           align-items: center;

@@ -1,33 +1,15 @@
 <template>
 	<view class="index">
-		<view class="top">
-			<view class="tit1">
-				商城APP
-			</view>
-			<view class="tit2">
-				红包群(5)
-			</view>
+		<image class="pic" src="/static/mcz1.png" mode=""></image>
+		<view class="btn" @click="toMiandan2">
+			<view class="tit1">点击进入</view>
+			<u-icon class="tit2" color="#af0000" name="arrow-right"></u-icon>
 		</view>
-		<view class="center">
-			<view class="item">
-				<view class="top-tit">
-					15:09
-				</view>
-				<view class="container">
-					<view class="user1">
-						<image class="pic" src="../../static/Group.png"></image>
-						<image @click="goTo" class="hb" src="../../static/组57.png"></image>
-					</view>
-				</view>
-			</view>
-			<view class="footer">
-				<image class="hbIcon" src="../../static/组54.png" mode=""></image>
-				<view class="tit">
-					你领取了XXX的
-					<text>红包</text>
-				</view>
-			</view>
-		</view>
+		<view class="txt1">拼单简介-抢红包流程</view>
+		<view class="txt2">点击进入页面</view>
+		<view class="txt3">选择免单订单可查看是否中奖</view>
+		<u-tabbar height=98 active-color="#EBBFCC" mid-button-size=39 v-model="current" :list="tabbarlist"
+			:mid-button="true"></u-tabbar>
 	</view>
 </template>
 
@@ -35,115 +17,154 @@
 	export default {
 		data() {
 			return {
-
+				openid:'',
+				tabbarlist: [{
+						iconPath: "/static/shouye.png",
+						selectedIconPath: "/static/shouye-active.png",
+						text: '首页',
+						pagePath: "/pages/index/index"
+					},
+					{
+						midButton: true,
+						iconPath: "/static/miandan.png",
+						selectedIconPath: "/static/miandan-active.png",
+						text: '免单',
+						customIcon: false,
+						pagePath: "/pages/freeCharge/freeCharge"
+					},
+					{
+						iconPath: "/static/zu27.png",
+						selectedIconPath: "static/zu242.png",
+						text: '购物车',
+						customIcon: false,
+						pagePath: "/pages/gouwuche/gouwuche"
+					},
+					{
+						iconPath: "/static/zu243.png",
+						selectedIconPath: "/static/zu245.png",
+						text: '我的',
+						customIcon: false,
+						pagePath: "/pages/wode/wode"
+					},
+				],
+				current: 1
 			}
 		},
+		//用户点击右上角分享转发
+		onShareAppMessage: async function() {
+			const res = await this.$api.wx_sharetouserid(this.openid);
+			console.log(res)
+		
+			var title = '拼60商城app'; //data，return 数据title
+			return {
+				title: title || '',
+				path: `/pages/index/index?scene=0_${res.share_userid}`,
+			}
+		},
+		//用户点击右上角分享朋友圈
+		onShareTimeline:async function() {
+			const res = await this.$api.wx_sharetouserid(this.openid);
+			console.log(res)
+			var title = '拼60商城app'; //data，return 数据title
+			return {
+				title: title || '',
+				path: `/pages/index/index?scene=0_${res.share_userid}`,
+			}
+		},
+		onShow() {
+			this.openid = uni.getStorageSync('openid')
+			this.getData();
+		},
 		methods: {
-goTo(){
-	uni.navigateTo({
-		url:'/pages/miandan/miandan'
-	})
-},
+			async getData(){
+				const res = await this.$api.wx_userorder(this.openid,2,1,50,1);
+				console.log(res)
+				this.list = res.list
+			},
+			goTo() {
+				uni.navigateTo({
+					url: '/pages/miandan/miandan'
+				})
+			},
+			toMiandan2(){
+				uni.navigateTo({
+					url: '/pages/freeCharge/miandantwo'
+				})
+			}
 		}
 	}
 </script>
 
 <style scoped lang="scss">
+	// page{
+	// 	height: 100;
+	// }
 	.index {
-		.top {
-			width: calc(1.82 * 414rpx);
-			height: calc(1.82 * 64rpx);
+		height: 100vh;
+		position: relative;
+		.pic{
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 750rpx;
+			height: 100%;
 			opacity: 1;
-			background: #d82423;
+		}
+		.btn{
+			position: absolute;
+			top: 48.2%;
+			left: 50%;
+			transform: translate(-50%,0);
+			width: 549rpx;
+			height: 90rpx;
+			opacity: 1;
+			background: linear-gradient(97deg,#ffe9c5 18%, #ffd88a 91%);
+			border-radius: 42rpx;
 			display: flex;
-			flex-direction: column;
 			align-items: center;
-
-			.tit1 {
-				margin-top: calc(1.82 * 5rpx);
+			.tit1{
 				opacity: 1;
-				font-size: calc(1.82 * 10rpx);
-				font-family: YouSheBiaoTiHei, YouSheBiaoTiHei-Regular;
-				font-weight: calc(1.82 * 400);
-				text-align: center;
-				color: #ffffff;
+				font-size: 29rpx;
+				font-family: PingFang SC, PingFang SC-Bold;
+				font-weight: 700;
+				color: #af0000;
+				line-height: 90rpx;
+				margin-left: 217rpx;
 			}
-
-			.tit2 {
-				margin-top: calc(1.82 * 10rpx);
-				opacity: 1;
-				font-size: 36rpx;
-				font-family: SourceHanSansCN-Regular;
-				text-align: center;
-				color: #ffffff;
-				line-height: 31rpx;
-				letter-spacing: 0rpx;
+				
+			.tit2{
+				margin-left: 112rpx;
 			}
 		}
-
-		.center {
-			margin-top: 31rpx;
-			border: 2rpx solid red;
-
-			.item {
-				.top-tit {
-					opacity: 1;
-					font-size: 20rpx;
-					font-family: SourceHanSansCN-Regular;
-					text-align: center;
-					color: #9b9b9b;
-					line-height: 31rpx;
-					letter-spacing: 0rpx;
-				}
-
-				.container {
-					// display: flex;
-					.user1 {
-						display: flex;
-						align-items: center;
-						.pic{
-							width: 92rpx;
-							height: 92rpx;
-							opacity: 1;
-							margin: 0 9rpx 0 49rpx;
-						}
-						.hb{
-							width: 478rpx;
-							height: 138rpx;
-							opacity: 1;
-						}
-					}
-				}
-			}
-			.footer{
-				margin-left: 50%;
-				transform: translateX(-50%);
-				margin-top: 30rpx;
-				width: 288rpx;
-				height: 45rpx;
-				opacity: 1;
-				border: 2rpx solid blue;
-				display: flex;
-				align-items: center;
-				.hbIcon{
-					width: 24rpx;
-					height: 24rpx;
-					opacity: 1;
-					margin: 0 19rpx 0 36rpx;
-				}
-				.tit{
-					font-size: 20rpx;
-					font-family: SourceHanSansCN-Regular;
-					text-align: center;
-					color: #9b9b9b;
-					line-height: 31rpx;
-					letter-spacing: 0rpx;
-					text{
-						color: #D82423;
-					}
-				}
-			}
-			
+		.txt1{
+			position: absolute;
+			top: 62%;
+			left: 50%;
+			opacity: 1;
+			font-size: 29rpx;
+			font-family: PingFang SC, PingFang SC-Heavy;
+			font-weight: 800;
+			color: #af0000;
+			transform: translate(-50%,0);
 		}
+		.txt2{
+			position: absolute;
+			top: 69.8%;
+			left: 50%;
+			font-size: 22rpx;
+			transform: translate(-50%,0);
+			font-weight: 800;
+		}
+		.txt3{
+			position: absolute;
+			top: 75.2%;
+			left: 50%;
+			font-size: 22rpx;
+			transform: translate(-50%,0);
+			font-weight: 800;
+		}
+	}
+	/deep/ .u-tabbar__content__circle__border{
+		display: none !important;
 	}
 </style>

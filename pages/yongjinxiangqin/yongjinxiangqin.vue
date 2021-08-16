@@ -6,19 +6,12 @@
 		</view> -->
 		<view class="container">
 			<view class="items">
-				<view class="item">
-					<image class="pic1" src="/static/矩形157@2x.png" mode=""></image>
-					<image class="pic2" src="/static/Group.png" mode=""></image>
+				<view class="item" v-for="(item,i) in list" :key='i'>
+					<image class="pic1" src="/static/juxin157@2x.png" mode=""></image>
+					<image class="pic2" :src="item.facepic" mode=""></image>
 					<view class="tit1">JAYJONE</view>
-					<view class="tit2">通过链接邀请·你已获得3元！</view>
-					<view class="tit3">+3元</view>
-				</view>
-				<view class="item">
-					<image class="pic1" src="../../static/矩形157@2x.png" mode=""></image>
-					<image class="pic2" src="../../static/Group.png" mode=""></image>
-					<view class="tit1">JAYJONE</view>
-					<view class="tit2">通过链接邀请·你已获得3元！</view>
-					<view class="tit3">+3元</view>
+					<view class="tit2">通过链接邀请·你已获得{{item.money}}元！</view>
+					<view class="tit3">+{{item.money}}元</view>
 				</view>
 			</view>
 		</view>
@@ -42,7 +35,7 @@
 		data() {
 			return {
 				openid: '',
-
+				list:[],
 			}
 		},
 		async onShow() {
@@ -53,6 +46,7 @@
 			async getData() {
 				const res = await this.$api.wx_usercommissionmore(this.openid,this.yjPage,this.yqhyPage);
 				console.log(res)
+				this.list = res.list;
 			},
 		}
 	}

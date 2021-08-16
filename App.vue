@@ -1,10 +1,10 @@
 <script>
 	export default {
-		onLaunch: function() {
-			console.log('App Launch')
+		onLaunch: function(route) {
+			console.log(route, 'cyy22222')
 		},
-		onShow: function() {
-			console.log('App Show')
+		onShow: function(route) {
+			console.log(route, 'cyy11111')
 		},
 		onHide: function() {
 			console.log('App Hide')
@@ -14,5 +14,4 @@
 
 <style lang="scss">
 	@import "uview-ui/index.scss";
-	
 </style>

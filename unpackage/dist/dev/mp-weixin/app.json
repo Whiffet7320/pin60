@@ -4,6 +4,7 @@
     "pages/miandan/miandan",
     "pages/index/newGoodThings",
     "pages/freeCharge/freeCharge",
+    "pages/freeCharge/miandantwo",
     "pages/nanzhuanzhuanqu/nanzhuanzhuanqu",
     "pages/shangpinxiangqin/shangpinxiangqin",
     "pages/shangpinxiangqin/tijiaodingdan",
@@ -11,15 +12,20 @@
     "pages/gouwuche/gouwuche",
     "pages/miandanjilu/miandanjilu",
     "pages/wode/wode",
-    "pages/wode/xinshouzhinan",
-    "pages/wode/shoucang",
-    "pages/wode/lijitixian",
-    "pages/wode/lishijilu",
     "pages/jiaoyijilu/jiaoyijilu",
-    "pages/yongjinxiangqin/yongjinxiangqin",
-    "pages/wode/lianxikefu"
+    "pages/yongjinxiangqin/yongjinxiangqin"
   ],
   "subPackages": [
+    {
+      "root": "pages/wode/user",
+      "pages": [
+        "xinshouzhinan",
+        "shoucang",
+        "lijitixian",
+        "lishijilu",
+        "lianxikefu"
+      ]
+    },
     {
       "root": "yaoqinghaoyou",
       "pages": [
@@ -69,30 +75,19 @@
     "borderStyle": "black",
     "list": [
       {
-        "pagePath": "pages/index/index",
-        "iconPath": "static/shouye.png",
-        "selectedIconPath": "static/shouye-active.png",
-        "text": "首页"
+        "pagePath": "pages/index/index"
       },
       {
-        "pagePath": "pages/freeCharge/freeCharge",
-        "iconPath": "static/miandan.png",
-        "selectedIconPath": "static/miandan-active.png",
-        "text": "免单"
+        "pagePath": "pages/freeCharge/freeCharge"
       },
       {
-        "pagePath": "pages/gouwuche/gouwuche",
-        "iconPath": "static/组27.png",
-        "selectedIconPath": "static/组242.png",
-        "text": "购物车"
+        "pagePath": "pages/gouwuche/gouwuche"
       },
       {
-        "pagePath": "pages/wode/wode",
-        "iconPath": "static/组243.png",
-        "selectedIconPath": "static/组245.png",
-        "text": "我的"
+        "pagePath": "pages/wode/wode"
       }
     ]
   },
-  "usingComponents": {}
+  "usingComponents": {},
+  "sitemapLocation": "sitemap.json"
 }

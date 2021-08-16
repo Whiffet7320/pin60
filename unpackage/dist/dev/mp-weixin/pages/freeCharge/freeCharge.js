@@ -77,6 +77,32 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "recyclableRender", function() { return recyclableRender; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "components", function() { return components; });
 var components
+try {
+  components = {
+    uIcon: function() {
+      return __webpack_require__.e(/*! import() | node-modules/uview-ui/components/u-icon/u-icon */ "node-modules/uview-ui/components/u-icon/u-icon").then(__webpack_require__.bind(null, /*! uview-ui/components/u-icon/u-icon.vue */ 350))
+    },
+    uTabbar: function() {
+      return __webpack_require__.e(/*! import() | node-modules/uview-ui/components/u-tabbar/u-tabbar */ "node-modules/uview-ui/components/u-tabbar/u-tabbar").then(__webpack_require__.bind(null, /*! uview-ui/components/u-tabbar/u-tabbar.vue */ 336))
+    }
+  }
+} catch (e) {
+  if (
+    e.message.indexOf("Cannot find module") !== -1 &&
+    e.message.indexOf(".vue") !== -1
+  ) {
+    console.error(e.message)
+    console.error("1. 排查组件名称拼写是否正确")
+    console.error(
+      "2. 排查组件是否符合 easycom 规范，文档：https://uniapp.dcloud.net.cn/collocation/pages?id=easycom"
+    )
+    console.error(
+      "3. 若组件不符合 easycom 规范，需手动引入，并在 components 中注册该组件"
+    )
+  } else {
+    throw e
+  }
+}
 var render = function() {
   var _vm = this
   var _h = _vm.$createElement
@@ -114,25 +140,7 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0; //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _regenerator = _interopRequireDefault(__webpack_require__(/*! ./node_modules/@babel/runtime/regenerator */ 19));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {try {var info = gen[key](arg);var value = info.value;} catch (error) {reject(error);return;}if (info.done) {resolve(value);} else {Promise.resolve(value).then(_next, _throw);}}function _asyncToGenerator(fn) {return function () {var self = this,args = arguments;return new Promise(function (resolve, reject) {var gen = fn.apply(self, args);function _next(value) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);}function _throw(err) {asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);}_next(undefined);});};} //
 //
 //
 //
@@ -150,14 +158,79 @@ __webpack_require__.r(__webpack_exports__);
 var _default =
 {
   data: function data() {
-    return {};
+    return {
+      openid: '',
+      tabbarlist: [{
+        iconPath: "/static/shouye.png",
+        selectedIconPath: "/static/shouye-active.png",
+        text: '首页',
+        pagePath: "/pages/index/index" },
 
+      {
+        midButton: true,
+        iconPath: "/static/miandan.png",
+        selectedIconPath: "/static/miandan-active.png",
+        text: '免单',
+        customIcon: false,
+        pagePath: "/pages/freeCharge/freeCharge" },
+
+      {
+        iconPath: "/static/zu27.png",
+        selectedIconPath: "static/zu242.png",
+        text: '购物车',
+        customIcon: false,
+        pagePath: "/pages/gouwuche/gouwuche" },
+
+      {
+        iconPath: "/static/zu243.png",
+        selectedIconPath: "/static/zu245.png",
+        text: '我的',
+        customIcon: false,
+        pagePath: "/pages/wode/wode" }],
+
+
+      current: 1 };
 
   },
+  //用户点击右上角分享转发
+  onShareAppMessage: function () {var _onShareAppMessage = _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee() {var res, title;return _regenerator.default.wrap(function _callee$(_context) {while (1) {switch (_context.prev = _context.next) {case 0:_context.next = 2;return (
+                this.$api.wx_sharetouserid(this.openid));case 2:res = _context.sent;
+              console.log(res);
+
+              title = '拼60商城app'; //data，return 数据title
+              return _context.abrupt("return", {
+                title: title || '',
+                path: "/pages/index/index?scene=0_".concat(res.share_userid) });case 6:case "end":return _context.stop();}}}, _callee, this);}));function onShareAppMessage() {return _onShareAppMessage.apply(this, arguments);}return onShareAppMessage;}(),
+
+
+  //用户点击右上角分享朋友圈
+  onShareTimeline: function () {var _onShareTimeline = _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee2() {var res, title;return _regenerator.default.wrap(function _callee2$(_context2) {while (1) {switch (_context2.prev = _context2.next) {case 0:_context2.next = 2;return (
+                this.$api.wx_sharetouserid(this.openid));case 2:res = _context2.sent;
+              console.log(res);
+              title = '拼60商城app'; //data，return 数据title
+              return _context2.abrupt("return", {
+                title: title || '',
+                path: "/pages/index/index?scene=0_".concat(res.share_userid) });case 6:case "end":return _context2.stop();}}}, _callee2, this);}));function onShareTimeline() {return _onShareTimeline.apply(this, arguments);}return onShareTimeline;}(),
+
+
+  onShow: function onShow() {
+    this.openid = uni.getStorageSync('openid');
+    this.getData();
+  },
   methods: {
+    getData: function getData() {var _this = this;return _asyncToGenerator( /*#__PURE__*/_regenerator.default.mark(function _callee3() {var res;return _regenerator.default.wrap(function _callee3$(_context3) {while (1) {switch (_context3.prev = _context3.next) {case 0:_context3.next = 2;return (
+                  _this.$api.wx_userorder(_this.openid, 2, 1, 50, 1));case 2:res = _context3.sent;
+                console.log(res);
+                _this.list = res.list;case 5:case "end":return _context3.stop();}}}, _callee3);}))();
+    },
     goTo: function goTo() {
       uni.navigateTo({
         url: '/pages/miandan/miandan' });
+
+    },
+    toMiandan2: function toMiandan2() {
+      uni.navigateTo({
+        url: '/pages/freeCharge/miandantwo' });
 
     } } };exports.default = _default;
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))

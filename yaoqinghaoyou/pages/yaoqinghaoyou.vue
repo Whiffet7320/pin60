@@ -1,55 +1,42 @@
 <template>
 	<view class="index">
-		<!-- 		<view class="nav">
-			<u-icon @click="goTo" name="arrow-left" size="30"></u-icon>
-			<view class="nav-title">邀请好友</view>
-		</view> -->
+		<u-toast ref="uToast" />
+		<image class="picc1111" src="/static/zu729.png" mode=""></image>
 		<view class="container">
 			<view class="nav1">
-				<image class="pic1" src="../../static/组141@2x.png" mode=""></image>
-				<view class="tit1">我累计获得的奖励</view>
-				<view class="tit2">
+				<image class="pic1" src="/static/zu1411.png" mode=""></image>
+				<!-- <view class="tit1"> -->
+				<view class="txt1">我累计获得的奖励</view>
+				<view class="txt2">
 					<view class="tit11">￥</view>
-					<view class="tit22">45.00</view>
-					<view class="tit33" @tap="toLijitixian">
-						<view class="tit44">提现</view>
-					</view>
+					<view class="tit22">{{commission_money}}</view>
+					<!-- </view> -->
 				</view>
+				<view class="tit2" @tap="toLijitixian">提现</view>
 			</view>
-			<view class="nav2" @tap="changeYqlj">
-				<image class="pic1" src="../../static/蒙版组73@2x.png" mode=""></image>
-				<view class="tit1">
-					<image class="pic2" src="../../static/路径295.png" mode=""></image>
-					<view class="tit">链接邀请</view>
-				</view>
-			</view>
-
-			<view class="nav3">
-				<image class="pic1" src="../../static/蒙版组72@2x.png" mode=""></image>
-				<view class="tit1">
-					<image class="pic2" src="../../static/组143.png" mode=""></image>
-					<view class="tit" @tap="toYaoqinerweima">邀请二维码</view>
-				</view>
-			</view>
+			<u-notice-bar class="nav2" font-size='22' :volume-icon="false" mode="vertical" :list="gdList">
+			</u-notice-bar>
+			<view class="nav3" @tap="wodetuanduiShow=true">我的团队</view>
+			<view class="nav4" @tap="toYaoqinerweima">邀请好友</view>
 
 		</view>
-		<view class="footer">
-			<view class="tab">
-				<view @tap="getActive('tab2')" :class="{ 'active': isActive, 'tab2':true }">通过二维码邀请</view>
-				<view @tap="getActive('tab1')" :class="{ 'active': !isActive, 'tab1':true }">通过链接邀请</view>
-			</view>
-			<view class="box">
-				<view class="items">
-					<view class="item" v-for="item in 10" :key="item">
-						<image class="pic" src="../../static/Group.png" mode=""></image>
-						<view class="tit">
-							<view class="tit1">JAYJONE</view>
-							<view class="tit2">你已获得3元！奖励次日到账~</view>
+		<!-- 链接邀请 -->
+		<u-popup class="wodetuandui" height="800rpx" v-model="wodetuanduiShow" mode="center" border-radius="14"
+			width="681rpx">
+			<view class="footer">
+				<view class="box">
+					<view class="items">
+						<view class="item" v-for="item in list" :key="item">
+							<image class="pic" :src="item.facepic" mode=""></image>
+							<view class="tit">
+								<view class="tit1">{{item.nickname}}</view>
+								<view class="tit2">{{item.remark}}</view>
+							</view>
 						</view>
 					</view>
 				</view>
 			</view>
-		</view>
+		</u-popup>
 		<!-- 链接邀请 -->
 		<u-popup class="ljyq" v-model="showLjyq" mode="center" border-radius="14" width="681rpx" height="364rpx">
 			<view class="tit1">邀请链接</view>
@@ -58,7 +45,11 @@
 			</view>
 			<view class="tit3" @tap="copy">复制</view>
 		</u-popup>
-
+		<!-- 分享二维码 -->
+		<u-popup v-model="fenxiangShow" mode="center" border-radius="14">
+			<image class="fxImg" :src="fenxiangImgSrc" mode=""></image>
+			<button @click="downImg" class="downImg">下载到本地</button>
+		</u-popup>
 
 	</view>
 </template>
@@ -79,10 +70,38 @@
 		},
 		data() {
 			return {
+				gdList: [],
 				isActive: true,
 				showLjyq: false,
+				wodetuanduiShow: false,
 				yqlink: 'DSJFGASKDZ41512',
 				openid: null,
+				commission_money: 0,
+				list: [],
+				fenxiangShow: false,
+				fenxiangImgSrc: '',
+				imgDownSrc: '',
+			}
+		},
+		//用户点击右上角分享转发
+		onShareAppMessage: async function() {
+			const res = await this.$api.wx_sharetouserid(this.openid);
+			console.log(res)
+		
+			var title = '拼60商城app'; //data，return 数据title
+			return {
+				title: title || '',
+				path: `/pages/index/index?scene=0_${res.share_userid}`,
+			}
+		},
+		//用户点击右上角分享朋友圈
+		onShareTimeline:async function() {
+			const res = await this.$api.wx_sharetouserid(this.openid);
+			console.log(res)
+			var title = '拼60商城app'; //data，return 数据title
+			return {
+				title: title || '',
+				path: `/pages/index/index?scene=0_${res.share_userid}`,
 			}
 		},
 		async onShow() {
@@ -93,12 +112,49 @@
 			async getData() {
 				const res = await this.$api.wx_usercommission(this.openid, this.yqhyPage, this.yqhyPageSize);
 				console.log(res)
+				this.commission_money = res.commission_money;
+				this.list = res.list;
+				const res2 = await this.$api.wx_usertopcommission(this.openid)
+				console.log(res2)
+				res2.list.forEach(ele => {
+					var time = this.formatMsgTime(new Date(ele.recommend_time).getTime())
+					var gd = `${time}邀请${ele.nickname} 已获得${ele.money}元佣金`
+					this.gdList.push(gd)
+				})
+			},
+			formatMsgTime(timespan) {
+				var dateTime = new Date(timespan);
+				var year = dateTime.getFullYear();
+				var month = dateTime.getMonth() + 1;
+				var day = dateTime.getDate();
+				var hour = dateTime.getHours();
+				var minute = dateTime.getMinutes();
+				var second = dateTime.getSeconds();
+				var now = new Date();
+				var now_new = Date.parse(now.toDateString()); //typescript转换写法
+				var milliseconds = 0;
+				var timeSpanStr;
+				milliseconds = now_new - timespan;
+				if (milliseconds <= 1000 * 60 * 1) {
+					timeSpanStr = '刚刚';
+				} else if (1000 * 60 * 1 < milliseconds && milliseconds <= 1000 * 60 * 60) {
+					timeSpanStr = Math.round((milliseconds / (1000 * 60))) + '分钟前';
+				} else if (1000 * 60 * 60 * 1 < milliseconds && milliseconds <= 1000 * 60 * 60 * 24) {
+					timeSpanStr = Math.round(milliseconds / (1000 * 60 * 60)) + '小时前';
+				} else if (1000 * 60 * 60 * 24 < milliseconds && milliseconds <= 1000 * 60 * 60 * 24 * 15) {
+					timeSpanStr = Math.round(milliseconds / (1000 * 60 * 60 * 24)) + '天前';
+				} else if (milliseconds > 1000 * 60 * 60 * 24 * 15 && year == now.getFullYear()) {
+					timeSpanStr = month + '-' + day + ' ' + hour + ':' + minute;
+				} else {
+					timeSpanStr = year + '-' + month + '-' + day + ' ' + hour + ':' + minute;
+				}
+				return timeSpanStr;
 			},
 			getActive(val) {
 				if (val == 'tab1') {
-					this.isActive = true;
-				} else {
 					this.isActive = false;
+				} else {
+					this.isActive = true;
 				}
 			},
 			goTo() {
@@ -106,10 +162,42 @@
 					url: "/pages/index/index"
 				})
 			},
-			toYaoqinerweima() {
-				uni.navigateTo({
-					url: '/pages/yaoqinghaoyou/yaoqinerweima'
+			downImg() {
+				const that = this;
+				uni.downloadFile({
+					url: that.imgDownSrc,
+					success(res) {
+						console.log(res)
+						uni.saveImageToPhotosAlbum({
+							filePath: res.tempFilePath,
+							success() {
+								console.log(res.tempFilePath, '成功')
+								that.$refs.uToast.show({
+									title: '已保存至相册',
+									type: 'success',
+								})
+							},
+							fail(res) {
+								console.log('fail')
+							},
+						})
+					}
 				})
+			},
+			async toYaoqinerweima() {
+				uni.showLoading({
+					title: '加载中'
+				});
+				this.fenxiangShow = true;
+				var signstr = "openid=" + this.openid + "&goods_id=" + 0 + "";
+				const md51 = this.$md5(signstr);
+				const md52 = md51 + this.$apikey;
+				const md = this.$md5(md52).toUpperCase()
+				const res = await this.$api.wx_shareqr(this.openid, 0, md)
+				console.log(res, 'cyy111')
+				this.fenxiangImgSrc = res.pic_url;
+				this.imgDownSrc = res.pic_url;
+				uni.hideLoading();
 			},
 			copy() {
 				uni.setClipboardData({
@@ -124,7 +212,7 @@
 			},
 			toLijitixian() {
 				uni.navigateTo({
-					url: '/pages/yaoqinghaoyou/lijitixian'
+					url: `/pages/wode/user/lijitixian?withdrawal_money=${this.commission_money}`
 				})
 			},
 		}
@@ -132,15 +220,25 @@
 </script>
 
 <style scoped lang="scss">
-	// page{
-	// 	width: 750rpx;
-	// 	height: 1333rpx;
-	// }
+	/* 	page{
+		width: 750rpx;
+		height: 1333rpx;
+	} */
 	.index {
 		position: relative;
-		// padding-top: 60rpx;
-		height: 100%;
+		height: 100vh;
 		width: 100%;
+		// background: rgb(255, 46, 70);
+		background: #FFFFFF;
+	}
+
+	.picc1111 {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 750rpx;
+		height: 806rpx;
+		opacity: 1;
 	}
 
 	.nav {
@@ -162,181 +260,169 @@
 	}
 
 	.container {
-		margin: 33rpx 43rpx 0 43rpx;
+		position: relative;
+		width: 750rpx;
+		height: 100%;
+
+		// margin: 33rpx 43rpx 0 43rpx;
 
 		.nav1 {
-			position: relative;
-			width: 663rpx;
-			height: 143rpx;
-			opacity: 1;
+			z-index: 3;
+			position: absolute;
+			top: 546rpx;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 717rpx;
+			height: 322rpx;
+			opacity: 0.9;
 
 			.pic1 {
 				position: absolute;
 				top: 0;
 				left: 0;
-				width: 663rpx;
-				height: 143rpx;
+				width: 717rpx;
+				height: 322rpx;
 				opacity: 1;
 			}
 
-			.tit1 {
+			// .tit1{
+			// 	position: absolute;
+			// 	top: 85rpx;
+			// 	display: flex;
+			// 	align-items: center;
+			.txt1 {
 				position: absolute;
-				top: 34rpx;
-				left: 45rpx;
+				top: 103rpx;
+				margin-left: 72rpx;
+				margin-right: 36rpx;
 				opacity: 1;
-				font-size: 18rpx;
+				font-size: 22rpx;
 				font-family: PingFang SC, PingFang SC-Regular;
 				font-weight: 400;
+				text-align: left;
 				color: #141313;
 			}
 
-			.tit2 {
-				height: 67rpx;
+			.txt2 {
 				position: absolute;
-				top: 51rpx;
-				left: 261rpx;
+				top: 85rpx;
+				left: 50%;
+				transform: translateX(-50%);
 				display: flex;
-				align-items: center;
+				align-items: flex-end;
 
 				.tit11 {
+					transform: translateY(-8rpx);
+					margin-right: 6rpx;
 					opacity: 1;
 					font-size: 22rpx;
 					font-family: PingFang SC, PingFang SC-Bold;
 					font-weight: 700;
-					color: #af0000;
-					transform: translateY(12rpx);
+					text-align: right;
+					color: #faa320;
 				}
 
 				.tit22 {
 					opacity: 1;
-					font-size: 50rpx;
+					font-size: 47rpx;
 					font-family: PingFang SC, PingFang SC-Bold;
 					font-weight: 700;
-					color: #af0000;
-				}
-
-				.tit33 {
-					margin-left: 85rpx;
-					width: 143rpx;
-					height: 40rpx;
-					opacity: 1;
-					background: #af0000;
-					border: 2rpx solid #ffffff;
-					border-radius: 22rpx;
-					display: flex;
-					align-items: center;
-					justify-content: center;
-
-					.tit44 {
-						opacity: 1;
-						font-size: 18rpx;
-						font-family: PingFang SC, PingFang SC-Regular;
-						font-weight: 400;
-						color: #ffffff;
-					}
+					text-align: right;
+					color: #faa320;
 				}
 			}
+
+			// }
+			.tit2 {
+				position: absolute;
+				top: 179rpx;
+				left: 50%;
+				transform: translateX(-50%);
+				width: 572rpx;
+				height: 69rpx;
+				opacity: 1;
+				background: linear-gradient(270deg, #ff2e46 0%, #f6bd62 100%);
+				border-radius: 34rpx;
+				font-size: 22rpx;
+				font-family: PingFang SC, PingFang SC-Bold;
+				font-weight: 700;
+				text-align: center;
+				line-height: 69rpx;
+				color: #ffffff;
+			}
+
 		}
 
 		.nav2 {
-			position: relative;
-			margin: 14rpx 0;
-			width: 663rpx;
-			height: 71rpx;
+			width: 600rpx;
+			position: absolute;
+			top: 889rpx;
+			left: 50%;
+			transform: translateX(-50%);
 			opacity: 1;
+			font-size: 22rpx;
+			font-family: PingFang SC, PingFang SC-Medium;
+			font-weight: 500;
+			text-align: center;
+			color: #707070;
 
-			.pic1 {
-				position: absolute;
-				top: 0;
-				margin: 0;
-				width: 663rpx;
-				height: 71rpx;
-				opacity: 1;
-			}
-
-			.tit1 {
-				position: relative;
-				display: flex;
-				height: 25rpx;
-				align-items: center;
-
-				.pic2 {
-					position: absolute;
-					top: 24rpx;
-					left: 257rpx;
-					width: 25rpx;
-					height: 25rpx;
-					opacity: 1;
-				}
-
-				.tit {
-					position: absolute;
-					top: 22rpx;
-					left: 306rpx;
-					opacity: 1;
-					font-size: 20rpx;
-					font-family: PingFang SC, PingFang SC-Regular;
-					font-weight: 400;
-					color: #9b9b9b;
-					letter-spacing: 6rpx;
-				}
+			/deep/ .u-news-item {
+				width: 100%;
+				text-align: center;
 			}
 		}
 
 		.nav3 {
-			position: relative;
+			z-index: 4;
+			position: absolute;
+			top: 970rpx;
+			left: 50%;
+			transform: translateX(-50%);
 			width: 663rpx;
-			height: 71rpx;
+			height: 72rpx;
 			opacity: 1;
-			margin-bottom: 34rpx;
-
-			.pic1 {
-				position: absolute;
-				top: 0;
-				margin: 0;
-				width: 663rpx;
-				height: 71rpx;
-				opacity: 1;
-			}
-
-			.tit1 {
-				position: relative;
-				display: flex;
-				height: 25rpx;
-				align-items: center;
-
-				.pic2 {
-					position: absolute;
-					top: 24rpx;
-					left: 257rpx;
-					width: 25rpx;
-					height: 24rpx;
-					opacity: 1;
-				}
-
-				.tit {
-					position: absolute;
-					top: 22rpx;
-					left: 306rpx;
-					opacity: 1;
-					font-size: 20rpx;
-					font-family: PingFang SC, PingFang SC-Regular;
-					font-weight: 400;
-					color: #9b9b9b;
-					letter-spacing: 6rpx;
-				}
-			}
+			background: #fddb09;
+			border-radius: 36rpx;
+			font-size: 22rpx;
+			font-family: PingFang SC, PingFang SC-Bold;
+			font-weight: 700;
+			text-align: center;
+			line-height: 72rpx;
+			color: #000000;
 		}
 
+		.nav4 {
+			z-index: 4;
+			position: absolute;
+			top: 1060rpx;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 663rpx;
+			height: 72rpx;
+			opacity: 1;
+			background: #fddb09;
+			border-radius: 36rpx;
+			font-size: 22rpx;
+			font-family: PingFang SC, PingFang SC-Bold;
+			font-weight: 700;
+			text-align: center;
+			line-height: 72rpx;
+			color: #000000;
+		}
 
 	}
 
 	.footer {
-		position: fixed;
-		bottom: 0;
-		width: 750rpx;
-		height: 857rpx;
-		opacity: 1;
+
+		// height: 857rpx;
+		.nav1 {
+			text-align: center;
+			opacity: 1;
+			font-size: 36rpx;
+			font-family: SourceHanSansCN-Regular;
+			color: #121212;
+			margin: 20rpx 0;
+		}
 
 		.tab {
 			height: 76rpx;
@@ -387,21 +473,20 @@
 
 		.box {
 			overflow: scroll;
-			margin: 0rpx 38rpx;
 			width: 674rpx;
 			height: 743rpx;
 			opacity: 1;
-			border: 2rpx solid #dcdcdc;
 			border-radius: 20rpx;
 
 			.items {
 				margin: 40rpx 26rpx 0 54rpx;
 
 				.item {
+					height: 95rpx;
 					display: flex;
 					align-items: center;
-					height: 60rpx;
-					margin-bottom: 60rpx;
+					// margin-bottom: 60rpx;
+					border-bottom: 2rpx solid #eeeeee;
 
 					.pic {
 						width: 60rpx;
@@ -473,5 +558,14 @@
 			text-align: center;
 			color: #ebbfcc;
 		}
+	}
+
+	.fxImg {
+		width: 414rpx;
+		height: 736rpx;
+	}
+
+	.downImg {
+		font-size: 25rpx;
 	}
 </style>

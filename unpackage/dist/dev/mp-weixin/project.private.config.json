@@ -17,6 +17,18 @@
           "pathName": "pages/shangpinxiangqin/shangpinxiangqin",
           "query": "id=19&scene=17_6",
           "scene": null
+        },
+        {
+          "name": "pages/index/index",
+          "pathName": "pages/index/index",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "pages/shangpinxiangqin/shangpinxiangqin",
+          "pathName": "pages/shangpinxiangqin/shangpinxiangqin",
+          "query": "scene=1_7",
+          "scene": null
         }
       ]
     }

@@ -3,7 +3,7 @@
 		<!-- 		<view class="nav">
 			<u-icon @click="goTo" name="arrow-left" size="30"></u-icon>
 			<view class="nav-title">免单记录</view>
-			<image src="../../static/组12.png" class="pic" mode=""></image>
+			<image src="/static/组12.png" class="pic" mode=""></image>
 		</view> -->
 		<view class="container">
 			<view class="items">
@@ -22,7 +22,7 @@
 			</view>
 			<view class="items2">
 				<view class="item">
-					<image class="pic1" src="/static/组252@2x.png" mode=""></image>
+					<image class="pic1" src="/static/zu252@2x.png" mode=""></image>
 					<view class="nav1">
 						<view class="tit">
 							<view class="tit1"></view>
@@ -48,27 +48,27 @@
 		</view>
 		<view class="zjgm">
 			<view class="container">
-				<image src="../../static/Path1.png" mode=""></image>
+				<image src="/static/Path1.png" mode=""></image>
 				<!-- <view class="tit1">立即购买</view> -->
 				<view class="bottom">
 					<u-radio-group wrap v-model="zjgmValue" @change="radioGroupChange">
 						<u-radio name=1>
 							<view class="wx">
-								<image class="dibu" src="/static/矩形139.png" mode=""></image>
-								<image class="wxpic" src="/static/组137.png" mode=""></image>
+								<image class="dibu" src="/static/juxin139.png" mode=""></image>
+								<image class="wxpic" src="/static/zu137.png" mode=""></image>
 								<view class="tit">微信支付</view>
 							</view>
 						</u-radio>
-						<u-radio name=2>
+						<!-- <u-radio name=2>
 							<view class="zfb">
-								<image class="dibu" src="/static/矩形139.png" mode=""></image>
-								<image class="wxpic" src="/static/路径287.png" mode=""></image>
+								<image class="dibu" src="/static/juxin139.png" mode=""></image>
+								<image class="wxpic" src="/static/lujin287.png" mode=""></image>
 								<view class="tit">支付宝支付</view>
 							</view>
-						</u-radio>
+						</u-radio> -->
 						<u-radio name=3>
 							<view class="zfb">
-								<image class="dibu" src="/static/矩形139.png" mode=""></image>
+								<image class="dibu" src="/static/juxin139.png" mode=""></image>
 								<u-icon class="wxpic" color="#EBBFCC" size="46" name="red-packet-fill"></u-icon>
 								<!-- <image class="wxpic" src="/static/路径287.png" mode=""></image> -->
 								<view class="tit">余额支付</view>
@@ -85,6 +85,16 @@
 			</view>
 			<view class="nav2" @click="pay">提交订单</view>
 		</view>
+		<!-- 跳转至添加收货人 -->
+		<u-popup class='zhidl' z-index="99999" v-model="shrshow" mode="center" border-radius="14">
+			<view class="zhidl2">
+				<view class="tit1">请添加收货人信息</view>
+				<view class="btns">
+					<u-button size="mini" type="success" @click='qd'>去添加</u-button>
+					<u-button size="mini" @click='qxqd'>取消</u-button>
+				</view>
+			</view>
+		</u-popup>
 		<u-toast ref="uToast" />
 	</view>
 </template>
@@ -93,6 +103,7 @@
 	export default {
 		data() {
 			return {
+				shrshow: false,
 				openid: null,
 				list: [],
 				receiverlist: [],
@@ -108,7 +119,7 @@
 				zjgmValue: 1,
 				// 是否免单
 				order_type: null,
-				recommend_userid:0,//推荐用户ID
+				recommend_userid: 0, //推荐用户ID
 			}
 		},
 		onLoad(option) {
@@ -116,7 +127,13 @@
 			this.order_type = option.order_type
 			this.openid = uni.getStorageSync('openid');
 			this.list = JSON.parse(option.list);
-			this.receiverlist = JSON.parse(option.receiverlist);
+			console.log(option.receiverlist)
+			if (option.receiverlist != undefined) {
+				this.receiverlist = JSON.parse(option.receiverlist);
+			} else {
+				this.shrshow = true;
+			}
+
 			console.log(this.list, this.receiverlist)
 			this.priceNum = 0;
 			this.shopPrice = 0;
@@ -142,9 +159,13 @@
 				uni.setStorageSync('type', 'mdgwc')
 			}
 		},
+
 		async onShow() {
+			var pages = getCurrentPages();
+			var beforePage = pages[pages.length - 2]; // 前一个页面
+			console.log(beforePage)
 			this.recommend_userid = uni.getStorageSync('scene')
-			console.log(this.recommend_userid,1111)
+			console.log(this.recommend_userid, 1111)
 			if (uni.getStorageSync('type') == 'gwc') {
 				var signstr = "openid=" + this.openid + "&order_type=" + 1 + "&buy_type=" + 2 +
 					"&goods_id=" + 0 + "&color=" + '' + "&size=" + '' + "&num=" +
@@ -157,6 +178,9 @@
 				if (res.result == 1) {
 					this.list = res.list;
 					this.receiverlist = res.receiverlist;
+					if (this.receiverlist) {
+						this.shrshow = false;
+					}
 				} else {
 					this.$refs.uToast.show({
 						title: res.msg,
@@ -176,6 +200,9 @@
 				if (res.result == 1) {
 					this.list = res.list;
 					this.receiverlist = res.receiverlist;
+					if (this.receiverlist) {
+						this.shrshow = false;
+					}
 				} else {
 					this.$refs.uToast.show({
 						title: res.msg,
@@ -194,6 +221,9 @@
 				if (res.result == 1) {
 					this.list = res.list;
 					this.receiverlist = res.receiverlist;
+					if (this.receiverlist) {
+						this.shrshow = false;
+					}
 				} else {
 					this.$refs.uToast.show({
 						title: res.msg,
@@ -213,6 +243,9 @@
 				if (res.result == 1) {
 					this.list = res.list;
 					this.receiverlist = res.receiverlist;
+					if (this.receiverlist) {
+						this.shrshow = false;
+					}
 				} else {
 					this.$refs.uToast.show({
 						title: res.msg,
@@ -222,6 +255,15 @@
 			}
 		},
 		methods: {
+			// 去添加收货人
+			qd() {
+				uni.navigateTo({
+					url: '/shouhuoxinxi/pages/shouhuoxinxi',
+				})
+			},
+			qxqd() {
+				this.shrshow = false;
+			},
 			goTo() {
 				uni.switchTab({
 					url: "/pages/index/index"
@@ -239,8 +281,10 @@
 			// 支付
 			async pay() {
 				console.log(uni.getStorageSync('type'))
+				const that = this;
 				if (uni.getStorageSync('type') == 'gwc') {
-					var signstr = "openid=" + this.openid + "&recommend_userid=" + this.recommend_userid + "&order_type=" +
+					var signstr = "openid=" + this.openid + "&recommend_userid=" + this.recommend_userid +
+						"&order_type=" +
 						this.order_type + "&buy_type=" + 2 +
 						"&goods_json=" + JSON.stringify(this.list) + "&address_id=" + this.receiverlist.id +
 						"&pay_money=" + this
@@ -254,7 +298,7 @@
 					const md = this.$md5(md52).toUpperCase()
 					const res = await this.$api.wx_payment(this.openid, this.order_type, 2, this.list, this
 						.receiverlist.id, this.priceNum, this.shopPrice, this.priceNum - this.shopPrice, this
-						.zjgmValue, md,this.recommend_userid)
+						.zjgmValue, md, this.recommend_userid)
 					console.log(res, 'gwc')
 					if (res.result == 1) {
 						if (this.zjgmValue == 3) {
@@ -265,20 +309,45 @@
 								duration: 1000
 							})
 						} else if (this.zjgmValue == 1) {
-							uni.requestPayment({
-								provider: 'wxpay',
-								timeStamp: res.payment.timestamp.toString(),
-								nonceStr: res.payment.nonceStr,
-								package: res.payment.package,
-								signType: 'MD5',
-								paySign: res.payment.paySign,
-								success: function(res) {
-									console.log('success:' + JSON.stringify(res));
-								},
-								fail: function(err) {
-									console.log('fail:' + JSON.stringify(err));
-								}
-							});
+							if (uni.getSystemInfoSync().platform == 'android' || uni.getSystemInfoSync().platform == 'ios') {
+								console.log('android')
+								uni.requestPayment({
+									"provider": 'wxpay',
+									"orderInfo": {
+										"appid": res.payment.appid,
+										"noncestr": res.payment.nonceStr,
+										"package": res.payment.package,
+										"partnerid": res.payment.partnerid,
+										"prepayid": res.payment.prepayid,
+										"timestamp": res.payment.timestamp,
+										"sign": res.payment.sign,
+									},
+									success: function(res) {
+										console.log('success:' + JSON.stringify(res));
+
+									},
+									fail: function(err) {
+										console.log('fail:' + JSON.stringify(err));
+
+									}
+								});
+							} else {
+								console.log('小程序')
+								uni.requestPayment({
+									provider: 'wxpay',
+									timeStamp: res.payment.timestamp.toString(),
+									nonceStr: res.payment.nonceStr,
+									package: res.payment.package,
+									signType: 'MD5',
+									paySign: res.payment.paySign,
+									success: function(res) {
+										console.log('success:' + JSON.stringify(res));
+									},
+									fail: function(err) {
+										console.log('fail:' + JSON.stringify(err));
+									}
+								});
+							}
 						}
 					} else {
 						this.$refs.uToast.show({
@@ -288,7 +357,8 @@
 						})
 					}
 				} else if (uni.getStorageSync('type') == 'xq') {
-					var signstr = "openid=" + this.openid + "&recommend_userid=" + this.recommend_userid + "&order_type=" + this.order_type + "&buy_type=" + 1 +
+					var signstr = "openid=" + this.openid + "&recommend_userid=" + this.recommend_userid +
+						"&order_type=" + this.order_type + "&buy_type=" + 1 +
 						"&goods_json=" + JSON.stringify(this.list) + "&address_id=" + this.receiverlist.id +
 						"&pay_money=" + this
 						.priceNum.toFixed(2) +
@@ -301,30 +371,57 @@
 					const md = this.$md5(md52).toUpperCase()
 					const res = await this.$api.wx_payment(this.openid, this.order_type, 1, this.list, this
 						.receiverlist.id, this.priceNum, this.shopPrice, this.priceNum - this.shopPrice, this
-						.zjgmValue, md,this.recommend_userid)
+						.zjgmValue, md, this.recommend_userid)
 					console.log(res, 'xq')
 					if (res.result == 1) {
 						if (this.zjgmValue == 3) {
 							this.$refs.uToast.show({
 								title: res.msg,
 								type: 'success',
-								duration: 1000
+								duration: 1000,
+								url: '/pages/wode/wode',
+								isTab: true,
 							})
 						} else if (this.zjgmValue == 1) {
-							uni.requestPayment({
-								provider: 'wxpay',
-								timeStamp: res.payment.timestamp.toString(),
-								nonceStr: res.payment.nonceStr,
-								package: res.payment.package,
-								signType: 'MD5',
-								paySign: res.payment.paySign,
-								success: function(res) {
-									console.log('success:' + JSON.stringify(res));
-								},
-								fail: function(err) {
-									console.log('fail:' + JSON.stringify(err));
-								}
-							});
+							if (uni.getSystemInfoSync().platform == 'android' || uni.getSystemInfoSync().platform == 'ios') {
+								console.log('android')
+								uni.requestPayment({
+									"provider": 'wxpay',
+									"orderInfo": {
+										"appid": res.payment.appid,
+										"noncestr": res.payment.nonceStr,
+										"package": res.payment.package,
+										"partnerid": res.payment.partnerid,
+										"prepayid": res.payment.prepayid,
+										"timestamp": res.payment.timestamp,
+										"sign": res.payment.sign,
+									},
+									success: function(res) {
+										console.log('success:' + JSON.stringify(res));
+
+									},
+									fail: function(err) {
+										console.log('fail:' + JSON.stringify(err));
+
+									}
+								});
+							} else {
+								console.log('小程序')
+								uni.requestPayment({
+									provider: 'wxpay',
+									timeStamp: res.payment.timestamp.toString(),
+									nonceStr: res.payment.nonceStr,
+									package: res.payment.package,
+									signType: 'MD5',
+									paySign: res.payment.paySign,
+									success: function(res) {
+										console.log('success:' + JSON.stringify(res));
+									},
+									fail: function(err) {
+										console.log('fail:' + JSON.stringify(err));
+									}
+								});
+							}
 						}
 
 					} else {
@@ -335,7 +432,8 @@
 						})
 					}
 				} else if (uni.getStorageSync('type') == 'mdxq') {
-					var signstr = "openid=" + this.openid + "&recommend_userid=" + this.recommend_userid + "&order_type=" + this.order_type + "&buy_type=" + 1 +
+					var signstr = "openid=" + this.openid + "&recommend_userid=" + this.recommend_userid +
+						"&order_type=" + this.order_type + "&buy_type=" + 1 +
 						"&goods_json=" + JSON.stringify(this.list) + "&address_id=" + this.receiverlist.id +
 						"&pay_money=" + this
 						.priceNum.toFixed(2) +
@@ -348,30 +446,56 @@
 					const md = this.$md5(md52).toUpperCase()
 					const res = await this.$api.wx_payment(this.openid, this.order_type, 1, this.list, this
 						.receiverlist.id, this.priceNum, this.shopPrice, this.priceNum - this.shopPrice, this
-						.zjgmValue, md,this.recommend_userid)
+						.zjgmValue, md, this.recommend_userid)
 					console.log(res, 'mdxq')
 					if (res.result == 1) {
 						if (this.zjgmValue == 3) {
 							this.$refs.uToast.show({
 								title: res.msg,
 								type: 'success',
-								duration: 1000
+								duration: 1000,
+								url: '/pages/wode/wode',
+								isTab: true,
 							})
 						} else if (this.zjgmValue == 1) {
-							uni.requestPayment({
-								provider: 'wxpay',
-								timeStamp: res.payment.timestamp.toString(),
-								nonceStr: res.payment.nonceStr,
-								package: res.payment.package,
-								signType: 'MD5',
-								paySign: res.payment.paySign,
-								success: function(res) {
-									console.log('success:' + JSON.stringify(res));
-								},
-								fail: function(err) {
-									console.log('fail:' + JSON.stringify(err));
-								}
-							});
+							if (uni.getSystemInfoSync().platform == 'android' || uni.getSystemInfoSync().platform == 'ios') {
+								console.log('android')
+								uni.requestPayment({
+									"provider": 'wxpay',
+									"orderInfo": {
+										"appid": res.payment.appid,
+										"noncestr": res.payment.nonceStr,
+										"package": res.payment.package,
+										"partnerid": res.payment.partnerid,
+										"prepayid": res.payment.prepayid,
+										"timestamp": res.payment.timestamp,
+										"sign": res.payment.sign,
+									},
+									success: function(res) {
+										console.log('success:' + JSON.stringify(res));
+									},
+									fail: function(err) {
+										console.log('fail:' + JSON.stringify(err));
+
+									}
+								});
+							}  else {
+								console.log('小程序')
+								uni.requestPayment({
+									provider: 'wxpay',
+									timeStamp: res.payment.timestamp.toString(),
+									nonceStr: res.payment.nonceStr,
+									package: res.payment.package,
+									signType: 'MD5',
+									paySign: res.payment.paySign,
+									success: function(res) {
+										console.log('success:' + JSON.stringify(res));
+									},
+									fail: function(err) {
+										console.log('fail:' + JSON.stringify(err));
+									}
+								});
+							}
 						}
 					} else {
 						this.$refs.uToast.show({
@@ -381,7 +505,8 @@
 						})
 					}
 				} else if (uni.getStorageSync('type') == 'mdgwc') {
-					var signstr = "openid=" + this.openid + "&recommend_userid=" + this.recommend_userid + "&order_type=" + this.order_type + "&buy_type=" + 2 +
+					var signstr = "openid=" + this.openid + "&recommend_userid=" + this.recommend_userid +
+						"&order_type=" + this.order_type + "&buy_type=" + 2 +
 						"&goods_json=" + JSON.stringify(this.list) + "&address_id=" + this.receiverlist.id +
 						"&pay_money=" + this
 						.priceNum.toFixed(2) +
@@ -394,7 +519,7 @@
 					const md = this.$md5(md52).toUpperCase()
 					const res = await this.$api.wx_payment(this.openid, this.order_type, 2, this.list, this
 						.receiverlist.id, this.priceNum, this.shopPrice, this.priceNum - this.shopPrice, this
-						.zjgmValue, md,this.recommend_userid)
+						.zjgmValue, md, this.recommend_userid)
 					console.log(res, 'mdgwc')
 					if (res.result == 1) {
 						if (this.zjgmValue == 3) {
@@ -407,20 +532,45 @@
 								duration: 1000
 							})
 						} else if (this.zjgmValue == 1) {
-							uni.requestPayment({
-								provider: 'wxpay',
-								timeStamp: res.payment.timestamp.toString(),
-								nonceStr: res.payment.nonceStr,
-								package: res.payment.package,
-								signType: 'MD5',
-								paySign: res.payment.paySign,
-								success: function(res) {
-									console.log('success:' + JSON.stringify(res));
-								},
-								fail: function(err) {
-									console.log('fail:' + JSON.stringify(err));
-								}
-							});
+							if (uni.getSystemInfoSync().platform == 'android' || uni.getSystemInfoSync().platform == 'ios') {
+								console.log('android')
+								uni.requestPayment({
+									"provider": 'wxpay',
+									"orderInfo": {
+										"appid": res.payment.appid,
+										"noncestr": res.payment.nonceStr,
+										"package": res.payment.package,
+										"partnerid": res.payment.partnerid,
+										"prepayid": res.payment.prepayid,
+										"timestamp": res.payment.timestamp,
+										"sign": res.payment.sign,
+									},
+									success: function(res) {
+										console.log('success:' + JSON.stringify(res));
+
+									},
+									fail: function(err) {
+										console.log('fail:' + JSON.stringify(err));
+
+									}
+								});
+							}else {
+								console.log('小程序')
+								uni.requestPayment({
+									provider: 'wxpay',
+									timeStamp: res.payment.timestamp.toString(),
+									nonceStr: res.payment.nonceStr,
+									package: res.payment.package,
+									signType: 'MD5',
+									paySign: res.payment.paySign,
+									success: function(res) {
+										console.log('success:' + JSON.stringify(res));
+									},
+									fail: function(err) {
+										console.log('fail:' + JSON.stringify(err));
+									}
+								});
+							}
 						}
 					} else {
 						this.$refs.uToast.show({
@@ -430,13 +580,27 @@
 						})
 					}
 				}
-
 			},
 		}
 	}
 </script>
 
 <style scoped lang="scss">
+	.zhidl {
+		.zhidl2 {
+			padding: 40rpx;
+
+			.tit1 {
+				margin-bottom: 16rpx;
+			}
+
+			.btns {
+				display: flex;
+				justify-content: space-around;
+			}
+		}
+	}
+
 	.index {
 		// padding-top: 60rpx;
 		height: 100%;
@@ -493,6 +657,7 @@
 					}
 
 					.tit {
+						margin-left: 20rpx;
 						margin-top: 12rpx;
 						width: 430rpx;
 

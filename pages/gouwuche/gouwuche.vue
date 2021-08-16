@@ -1,179 +1,212 @@
 <template>
 	<view class="index">
-		<u-toast ref="uToast" />
-		<!-- 		<view class="top">
+		<view class="content">
+			<u-toast ref="uToast" />
+			<!-- 		<view class="top">
 			<view class="tit1">
 				商城APP
 			</view>
 		</view> -->
-		<view class="nav">
-			<view class="nav-title">购物车</view>
-		</view>
-		<!-- 不为空 -->
-		<view class="container" v-if="list.length>0">
-			<view class="items">
-				<view class="item" v-for="item in list" :key="item.cartid">
-					<image class="pic1" :src="item.img" mode=""></image>
-					<view class="right">
-						<view class="tit1">
-							<view class="txt">{{item.title}}</view>
-							<image @click="delShop(item)" class="pic" src="../../static/组34.png" mode=""></image>
+			<view class="nav">
+				<view class="nav-title">购物车</view>
+			</view>
+			<!-- 不为空 -->
+			<view class="container" v-if="list.length>0">
+				<view class="items">
+					<view class="item" v-for="item in list" :key="item.cartid">
+						<image @click="toxiangqin(item)" class="pic1" :src="item.img" mode=""></image>
+						<view class="right">
+							<view class="tit1">
+								<view class="txt">{{item.title}}</view>
+								<image @click="delShop(item)" class="pic" src="/static/zu34.png" mode=""></image>
+							</view>
+							<view class="tit111">
+								<view class="tit2">￥{{item.price}}</view>
+								<view class="tit2-1">{{ item.color }}</view>
+								<view class="tit2-2">{{item.size}}</view>
+							</view>
+
+							<view class="tit3">
+								<image @click="jianShop(item)" class="pic2" src="/static/zu162.png" mode=""></image>
+								<view class="tit">{{item.goods_num}}</view>
+								<image @click="addShop(item)" class="pic1" src="/static/zu163.png" mode=""></image>
+								<image class="pic3" src="/static/zu74.png" mode=""></image>
+								<image class="pic4" src="/static/zu73.png" mode=""></image>
+							</view>
 						</view>
-						<view class="tit111">
+					</view>
+					<view class="noMore">没有更多啦~</view>
+				</view>
+			</view>
+
+			<!-- 为空 -->
+			<view class="kong-container" v-else>
+				<view class="kong">
+					<image src="/static/zu40.png" mode=""></image>
+				</view>
+				<view class="line"></view>
+			</view>
+
+
+
+			<view class="nav2">
+				<view class="nav-title">猜你喜欢</view>
+			</view>
+			<view class="container2">
+				<view class="items">
+					<view class="item" v-for="item in cnxhList" :key="item.id">
+						<image @click="toxiangqin(item)" class="pic1" :src="item.img" mode=""></image>
+						<view class="right">
+							<view class="tit1">
+								<view class="txt">{{item.title}}</view>
+							</view>
 							<view class="tit2">￥{{item.price}}</view>
-							<view class="tit2-1">{{ item.color }}</view>
-							<view class="tit2-2">{{item.size}}</view>
-						</view>
-
-						<view class="tit3">
-							<image @click="jianShop(item)" class="pic2" src="../../static/组162.png" mode=""></image>
-							<view class="tit">{{item.goods_num}}</view>
-							<image @click="addShop(item)" class="pic1" src="../../static/组163.png" mode=""></image>
-							<image class="pic3" src="../../static/组74.png" mode=""></image>
-							<image class="pic4" src="../../static/组73.png" mode=""></image>
 						</view>
 					</view>
-				</view>
-				<view class="noMore">没有更多啦~</view>
-			</view>
-		</view>
-
-		<!-- 为空 -->
-		<view class="kong-container" v-else>
-			<view class="kong">
-				<image src="../../static/组40.png" mode=""></image>
-			</view>
-			<view class="line"></view>
-		</view>
-
-
-
-		<view class="nav2">
-			<view class="nav-title">猜你喜欢</view>
-		</view>
-		<view class="container2">
-			<view class="items">
-				<view class="item" v-for="item in cnxhList" :key="item.id">
-					<image class="pic1" :src="item.img" mode=""></image>
-					<view class="right">
-						<view class="tit1">
-							<view class="txt">{{item.title}}</view>
-							<image v-if="isLike" @click="changeLike" class="pic" src="../../static/路径23.png" mode="">
-							</image>
-							<image v-else @click="changeLike" class="pic" src="../../static/路径24.png" mode=""></image>
-						</view>
-						<view class="tit2">￥{{item.price}}</view>
-					</view>
-				</view>
-				<view class="noMore">没有更多啦~</view>
-			</view>
-		</view>
-
-		<!-- 结算 -->
-		<view class="footer">
-			<view class="tit1">
-				<view class="tit1-1">
-					<view class="tit1-1-1">合计：</view>
-					<view class="tit1-1-2">{{priceNum}}</view>
-				</view>
-				<view class="tit1-2">运费：{{yunPrice}}</view>
-			</view>
-			<view class="btns">
-				<view class="tit2" @tap="toZjgm">直接购买</view>
-				<view class="tit3" @tap="toMiandangoumai">免单购买</view>
-			</view>
-
-		</view>
-
-		<!-- 免单购买 -->
-		<u-popup class="mdgm" v-model="mdgmShow" mode="bottom" height="1065">
-			<view class="container">
-				<!-- <image src="../../static/Path.png" mode=""></image> -->
-				<view class="tit1">免单购买协议</view>
-				<view class="close" @tap="closeMdgm">
-					<image src="../../static/组82.png" mode=""></image>
-				</view>
-				<view class="center">
-					<view class="txt1">
-						1.甲方在验收中，如果发现产品的品种、型号、规格、花色和质量不合规定，应一面妥为保管，一面在30天内向乙方提出书面异议;在托收承付期内，甲方有权拒付不符合合同规定部分的货款。甲方怠于通知或者自标的物收到之日起过两年内未通知乙方的，视为产品合乎规定
-					</view>
-					<view class="txt1">
-						2.甲方因使用、保管、保养不善等造成产品质量下降的，不得提出异议。 </view>
-					<view class="txt1">
-						3.乙方在接到需方书面异议后，应在10天内负责处理，否则，即视为默认甲方提出的异议和处理意见。 </view>
-					<view class="txt1">
-						第六条　乙方的违约责任 </view>
-					<view class="txt1">
-						1.乙方不能交货的，应向甲方偿付不能交货部分货款的___%的违约金。 </view>
-					<view class="txt1">
-						2.乙方所交产品品种、型号、规格、质量不符合规定的，由乙方负责包换或包修，并承担修理、调换或退货而支付的实际费用。
-					</view>
-					<view class="txt1">
-						4.乙方逾期交货的，应比照中国人民银行有关延期付款的规定，按逾期交货部分货款计算，向甲方偿付逾期交货的违约金，并承担甲方因此所受的损失费用。 </view>
-					<view class="txt1">
-						6.产品错发到货地点或接货人的，乙方除应负责运交合同规定的到货地点或接货人外，还应承担甲方因此多支付的一切实际费用和逾期交货的违约金。 </view>
-					<view class="txt1">
-						第七条　甲方的违约责任 </view>
-					<view class="txt1">
-						1.甲方中途退货，应向乙方偿付退货部分货款___%的违约金。 </view>
-					<view class="txt2">
-						4.甲方逾期付款的，应按中国人民银行有关延期付款的规定向乙方偿付逾期付款的违约金。 </view>
-
+					<view class="noMore">没有更多啦~</view>
 				</view>
 			</view>
+
+			<!-- 结算 -->
 			<view class="footer">
-				<u-checkbox-group class="tit">
-					<u-checkbox v-model="checked"><text>我已阅读且了解并签约协议</text></u-checkbox>
-				</u-checkbox-group>
-				<view class="item" @click="miandanToZjgm">
+				<view class="tit1">
+					<view class="tit1-1">
+						<view class="tit1-1-1">合计：</view>
+						<view class="tit1-1-2">{{priceNum}}</view>
+					</view>
+					<view class="tit1-2">运费：{{yunPrice}}</view>
+				</view>
+				<view class="btns">
+					<view class="tit2" @tap="toZjgm">直接购买</view>
+					<view class="tit3" @tap="toMiandangoumai">免单购买</view>
+				</view>
+
+			</view>
+
+			<!-- 免单购买 -->
+			<u-popup class="mdgm" v-model="mdgmShow" mode="bottom" height="1065">
+				<view class="container">
+					<view class="tit1">免单购买协议</view>
+					<view class="close" @tap="closeMdgm">
+						<image src="/static/zu82.png" mode=""></image>
+					</view>
+					<view class="center">
+						<view class="txt1">
+							1.甲方在验收中，如果发现产品的品种、型号、规格、花色和质量不合规定，应一面妥为保管，一面在30天内向乙方提出书面异议;在托收承付期内，甲方有权拒付不符合合同规定部分的货款。甲方怠于通知或者自标的物收到之日起过两年内未通知乙方的，视为产品合乎规定
+						</view>
+						<view class="txt1">
+							2.甲方因使用、保管、保养不善等造成产品质量下降的，不得提出异议。 </view>
+						<view class="txt1">
+							3.乙方在接到需方书面异议后，应在10天内负责处理，否则，即视为默认甲方提出的异议和处理意见。 </view>
+						<view class="txt1">
+							第六条　乙方的违约责任 </view>
+						<view class="txt1">
+							1.乙方不能交货的，应向甲方偿付不能交货部分货款的___%的违约金。 </view>
+						<view class="txt1">
+							2.乙方所交产品品种、型号、规格、质量不符合规定的，由乙方负责包换或包修，并承担修理、调换或退货而支付的实际费用。
+						</view>
+						<view class="txt1">
+							4.乙方逾期交货的，应比照中国人民银行有关延期付款的规定，按逾期交货部分货款计算，向甲方偿付逾期交货的违约金，并承担甲方因此所受的损失费用。 </view>
+						<view class="txt1">
+							6.产品错发到货地点或接货人的，乙方除应负责运交合同规定的到货地点或接货人外，还应承担甲方因此多支付的一切实际费用和逾期交货的违约金。 </view>
+						<view class="txt1">
+							第七条　甲方的违约责任 </view>
+						<view class="txt1">
+							1.甲方中途退货，应向乙方偿付退货部分货款___%的违约金。 </view>
+						<view class="txt2">
+							4.甲方逾期付款的，应按中国人民银行有关延期付款的规定向乙方偿付逾期付款的违约金。 </view>
+
+					</view>
+				</view>
+				<view class="footer">
+					<u-checkbox-group class="tit">
+						<u-checkbox v-model="checked"><text>我已阅读且了解并签约协议</text></u-checkbox>
+					</u-checkbox-group>
+					<view class="item" @click="miandanToZjgm">
+						<view class="tit1">立即购买</view>
+						<u-icon class="icon" name="arrow-right" size="20"></u-icon>
+					</view>
+				</view>
+			</u-popup>
+			<!-- 直接购买 -->
+			<u-popup class="zjgm" v-model="zjgmShow" mode="bottom" height="716">
+				<view class="container">
+					<image src="/static/Path1.png" mode=""></image>
 					<view class="tit1">立即购买</view>
-					<u-icon class="icon" name="arrow-right" size="20"></u-icon>
+					<view class="close" @tap="closeZjgm">
+						<image src="/static/zu82.png" mode=""></image>
+					</view>
+					<view class="bottom">
+						<u-radio-group wrap v-model="value" @change="radioGroupChange">
+							<u-radio name="wx">
+								<view class="wx">
+									<image class="dibu" src="/static/juxin139.png" mode=""></image>
+									<image class="wxpic" src="/static/zu137.png" mode=""></image>
+									<view class="tit">微信支付</view>
+								</view>
+							</u-radio>
+							<u-radio name="zfb">
+								<view class="zfb">
+									<image class="dibu" src="/static/juxin139.png" mode=""></image>
+									<image class="wxpic" src="/static/lujin287.png" mode=""></image>
+									<view class="tit">支付宝支付</view>
+								</view>
+							</u-radio>
+						</u-radio-group>
+					</view>
 				</view>
-			</view>
-		</u-popup>
-		<!-- 直接购买 -->
-		<u-popup class="zjgm" v-model="zjgmShow" mode="bottom" height="716">
-			<view class="container">
-				<image src="../../static/Path1.png" mode=""></image>
-				<view class="tit1">立即购买</view>
-				<view class="close" @tap="closeZjgm">
-					<image src="../../static/组82.png" mode=""></image>
+				<view class="footer">
+					<view class="tit">
+						支付￥599.69
+					</view>
 				</view>
-				<view class="bottom">
-					<u-radio-group wrap v-model="value" @change="radioGroupChange">
-						<u-radio name="wx">
-							<view class="wx">
-								<image class="dibu" src="../../static/矩形139.png" mode=""></image>
-								<image class="wxpic" src="../../static/组137.png" mode=""></image>
-								<view class="tit">微信支付</view>
-							</view>
-						</u-radio>
-						<u-radio name="zfb">
-							<view class="zfb">
-								<image class="dibu" src="../../static/矩形139.png" mode=""></image>
-								<image class="wxpic" src="../../static/路径287.png" mode=""></image>
-								<view class="tit">支付宝支付</view>
-							</view>
-						</u-radio>
-					</u-radio-group>
+			</u-popup>
+			<!-- 直接购买跳转至登录 -->
+			<u-popup class='zhidl' z-index="99999" v-model="newzjgmshow" mode="center" border-radius="14">
+				<view class="zhidl2">
+					<view class="tit1">您还未登录，是否去登录？</view>
+					<view class="btns">
+						<u-button size="mini" type="success" @click='qd'>去登录</u-button>
+						<u-button size="mini" @click='qxqd'>取消</u-button>
+					</view>
 				</view>
-			</view>
-			<view class="footer">
-				<view class="tit">
-					支付￥599.69
-				</view>
-			</view>
-		</u-popup>
+			</u-popup>
+		</view>
 
+		<u-tabbar height=98 active-color="#EBBFCC" mid-button-size=39 v-model="current" :list="tabbarlist"
+			:mid-button="true"></u-tabbar>
 	</view>
 </template>
 
 <script>
-	import { mapState } from "vuex";
+	import {
+		mapState
+	} from "vuex";
 	export default {
 		computed: {
-		    ...mapState(["mdgmShow"]),
-		  },
+			...mapState(["mdgmShow"]),
+		},
+		//用户点击右上角分享转发
+		onShareAppMessage: async function() {
+			const res = await this.$api.wx_sharetouserid(this.openid);
+			console.log(res)
+		
+			var title = '拼60商城app'; //data，return 数据title
+			return {
+				title: title || '',
+				path: `/pages/index/index?scene=0_${res.share_userid}`,
+			}
+		},
+		//用户点击右上角分享朋友圈
+		onShareTimeline:async function() {
+			const res = await this.$api.wx_sharetouserid(this.openid);
+			console.log(res)
+			var title = '拼60商城app'; //data，return 数据title
+			return {
+				title: title || '',
+				path: `/pages/index/index?scene=0_${res.share_userid}`,
+			}
+		},
 		data() {
 			return {
 				isLike: true,
@@ -190,12 +223,49 @@
 				priceNum: 0,
 				// 总运费
 				yunPrice: 0,
+				// 底部导航栏
+				tabbarlist: [{
+						iconPath: "/static/shouye.png",
+						selectedIconPath: "/static/shouye-active.png",
+						text: '首页',
+						pagePath: "/pages/index/index"
+					},
+					{
+						iconPath: "/static/miandan.png",
+						selectedIconPath: "/static/miandan-active.png",
+						text: '免单',
+						customIcon: false,
+						pagePath: "/pages/freeCharge/freeCharge"
+					},
+					{
+						midButton: true,
+						iconPath: "/static/zu27.png",
+						selectedIconPath: "/static/zu242.png",
+						text: '购物车',
+						customIcon: false,
+						pagePath: "/pages/gouwuche/gouwuche"
+					},
+					{
+						iconPath: "/static/zu243.png",
+						selectedIconPath: "/static/zu245.png",
+						text: '我的',
+						customIcon: false,
+						pagePath: "/pages/wode/wode"
+					},
+				],
+				current: 2,
+				// 跳转至登录
+				newzjgmshow: false,
 			}
 		},
 		onLoad(option) {
 			this.openid = uni.getStorageSync('openid')
 		},
 		onShow() {
+			this.openid = uni.getStorageSync('openid')
+			if (this.openid) {
+				this.newzjgmshow = false
+			}
 			this.getData();
 		},
 		methods: {
@@ -203,20 +273,42 @@
 				this.yunPrice = 0;
 				this.priceNum = 0;
 				const res = await this.$api.wx_cartlist(this.openid);
-				console.log(res);
-				if (res.list) {
-					this.list = res.list;
-					res.list.forEach(ele => {
-						// this.priceNum
-						this.yunPrice += ele.postage;
-						this.priceNum += (ele.price) * ele.goods_num + ele.postage;
-					})
+				console.log(res, 'res');
+				if (res.result == 1) {
+					if (res.list) {
+						this.list = res.list;
+						res.list.forEach(ele => {
+							// this.priceNum
+							this.yunPrice += ele.postage;
+							this.priceNum += (ele.price) * ele.goods_num + ele.postage;
+						})
+					} else {
+						this.list = []
+					}
 				} else {
-					this.list = []
+					this.newzjgmshow = true;
 				}
+
 				const res2 = await this.$api.wx_goodslike(this.openid)
-				console.log(res2)
+				console.log(res2, 'res2')
 				this.cnxhList = res2.list;
+			},
+			// 点击图片跳转至购物车
+			toxiangqin(item){
+				console.log(item)
+				uni.navigateTo({
+					url:`/pages/shangpinxiangqin/shangpinxiangqin?id=${item.id}`
+				})
+			},
+			// 跳转至登录
+			qd() {
+				uni.navigateTo({
+					url: '/weixinshouquan/pages/weixinshouquan'
+				})
+			},
+			// 取消登录
+			qxqd() {
+				this.newzjgmshow = false;
 			},
 			// 加数量
 			async addShop(item) {
@@ -271,10 +363,10 @@
 				this.isLike = !this.isLike
 			},
 			toMiandangoumai() {
-				this.$store.commit('mdgmShow',true)
+				this.$store.commit('mdgmShow', true)
 			},
 			closeMdgm() {
-				this.$store.commit('mdgmShow',false)
+				this.$store.commit('mdgmShow', false)
 				// this.mdgmShow = false
 			},
 			// 直接购买
@@ -288,7 +380,7 @@
 				const res = await this.$api.order_submission(this.openid, 1, 2, 0, '', '', 0, md)
 				console.log(res)
 				if (res.result == 1) {
-					
+
 					this.$refs.uToast.show({
 						title: res.msg,
 						type: 'success',
@@ -360,6 +452,23 @@
 </script>
 
 <style scoped lang="scss">
+	.content {}
+
+	.zhidl {
+		.zhidl2 {
+			padding: 40rpx;
+
+			.tit1 {
+				margin-bottom: 16rpx;
+			}
+
+			.btns {
+				display: flex;
+				justify-content: space-around;
+			}
+		}
+	}
+
 	.index {
 		position: relative;
 	}
@@ -404,6 +513,7 @@
 				}
 
 				.right {
+					margin-left: 14rpx;
 					width: calc(100% - 98rpx);
 
 					.tit1 {
@@ -571,7 +681,7 @@
 
 				.right {
 					width: calc(100% - 98rpx);
-
+					margin-left: 14rpx;
 					.tit1 {
 						display: flex;
 						align-items: center;
@@ -691,7 +801,8 @@
 
 	.footer {
 		position: fixed;
-		bottom: 0rpx;
+		bottom: calc(100rpx + constant(safe-area-inset-bottom));
+		bottom: calc(100rpx + env(safe-area-inset-bottom));
 		width: 750rpx;
 		height: 136rpx;
 		opacity: 1;
@@ -833,7 +944,7 @@
 
 		.footer {
 			position: fixed;
-			bottom: 0;
+			bottom: 0px;
 			width: 750rpx;
 			height: 80rpx;
 			opacity: 1;
@@ -1013,5 +1124,8 @@
 				line-height: 36rpx;
 			}
 		}
+	}
+	/deep/ .u-tabbar__content__circle__border{
+		display: none !important;
 	}
 </style>

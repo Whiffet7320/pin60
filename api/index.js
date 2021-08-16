@@ -207,12 +207,11 @@ export default {
 			url: urls.wx_index,
 		})
 	},
-	wx_goodsview(id,openid) {
+	wx_goodsview(id, openid) {
 		return myPost({
 			url: urls.wx_goodsview,
 			data: {
-				id,
-				openid,
+				id
 			},
 		})
 	},
@@ -593,6 +592,56 @@ export default {
 				openid,
 				page,
 				pagesize
+			},
+		})
+	},
+	wx_userrecommend(openid, recommend_userid, sign) {
+		return myPost({
+			url: urls.wx_userrecommend,
+			data: {
+				openid,
+				recommend_userid,
+				sign
+			},
+		})
+	},
+	wx_usertopcommission(openid){
+		return myPost({
+			url: urls.wx_usertopcommission,
+			data: {
+				openid,
+			},
+		})
+	},
+	wx_sharetouserid(openid){
+		return myPost({
+			url: urls.wx_sharetouserid,
+			data: {
+				openid,
+			},
+		})
+	},
+	wx_loginuserinfo(obj){
+		return myPost({
+			url: urls.wx_loginuserinfo,
+			data: {
+				...obj
+			},
+		})
+	},
+	app_wxlogin(obj){
+		return myPost({
+			url: urls.app_wxlogin,
+			data: {
+				...obj
+			},
+		})
+	},
+	app_upgrade(obj){
+		return myPost({
+			url: urls.app_upgrade,
+			data: {
+				...obj
 			},
 		})
 	},

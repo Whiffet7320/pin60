@@ -5,20 +5,20 @@
 			<view class="nav-title">提现</view>
 		</view> -->
 		<view class="container">
-			<image src="../../static/Path1.png" mode=""></image>
+			<image src="/static/Path1.png" mode=""></image>
 			<view class="bottom">
 				<u-radio-group wrap v-model="value" @change="radioGroupChange">
 					<u-radio name="wx">
 						<view class="wx">
-							<image class="dibu" src="../../static/矩形139.png" mode=""></image>
-							<image class="wxpic" src="../../static/组137.png" mode=""></image>
+							<image class="dibu" src="/static/juxin139.png" mode=""></image>
+							<image class="wxpic" src="/static/zu137.png" mode=""></image>
 							<view class="tit">微信支付</view>
 						</view>
 					</u-radio>
 					<u-radio name="zfb">
 						<view class="zfb">
-							<image class="dibu" src="../../static/矩形139.png" mode=""></image>
-							<image class="wxpic" src="../../static/路径287.png" mode=""></image>
+							<image class="dibu" src="/static/juxin139.png" mode=""></image>
+							<image class="wxpic" src="/static/lujin287.png" mode=""></image>
 							<view class="tit">支付宝支付</view>
 						</view>
 					</u-radio>

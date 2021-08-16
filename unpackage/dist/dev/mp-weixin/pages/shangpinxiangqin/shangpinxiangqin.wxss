@@ -24,6 +24,19 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
+.zhidl .zhidl2.data-v-5a86d326 {
+  padding: 40rpx;
+}
+.zhidl .zhidl2 .tit1.data-v-5a86d326 {
+  margin-bottom: 16rpx;
+}
+.zhidl .zhidl2 .btns.data-v-5a86d326 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-justify-content: space-around;
+          justify-content: space-around;
+}
 .nav.data-v-5a86d326 {
   position: relative;
 }
@@ -288,6 +301,7 @@
   width: 748rpx;
   height: 770rpx;
   opacity: 1;
+  padding: 20rpx 44rpx;
 }
 .container image.data-v-5a86d326 {
   width: 100%;
@@ -295,9 +309,9 @@
 }
 .footer.data-v-5a86d326 {
   position: fixed;
-  bottom: 0;
+  bottom: 0rpx;
   width: 100%;
-  height: 80rpx;
+  height: 110rpx;
   opacity: 1;
   background: #ffffff;
   display: -webkit-box;
@@ -337,7 +351,7 @@
   -webkit-box-align: center;
   -webkit-align-items: center;
           align-items: center;
-  height: 80rpx;
+  height: 110rpx;
 }
 .footer .right .item1.data-v-5a86d326 {
   display: -webkit-box;
@@ -350,7 +364,7 @@
   -webkit-justify-content: center;
           justify-content: center;
   width: 223rpx;
-  height: 80rpx;
+  height: 110rpx;
   opacity: 1;
   background: #f6f6f6;
   font-size: 25rpx;
@@ -372,7 +386,7 @@
   -webkit-justify-content: center;
           justify-content: center;
   width: 223rpx;
-  height: 80rpx;
+  height: 110rpx;
   opacity: 1;
   background: #ebbfcc;
   font-size: 25rpx;
@@ -630,5 +644,8 @@
 .fxImg.data-v-5a86d326 {
   width: 414rpx;
   height: 736rpx;
+}
+.downImg.data-v-5a86d326 {
+  font-size: 25rpx;
 }
 

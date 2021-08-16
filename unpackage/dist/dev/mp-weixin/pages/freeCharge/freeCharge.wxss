@@ -24,55 +24,30 @@
 /* 垂直间距 */
 /* 透明度 */
 /* 文章场景相关 */
-.index .top.data-v-51e5c746 {
-  width: calc(1.82 * 414rpx);
-  height: calc(1.82 * 64rpx);
+.index.data-v-51e5c746 {
+  height: 100vh;
+  position: relative;
+}
+.index .pic.data-v-51e5c746 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 750rpx;
+  height: 100%;
   opacity: 1;
-  background: #d82423;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-  -webkit-flex-direction: column;
-          flex-direction: column;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-          align-items: center;
 }
-.index .top .tit1.data-v-51e5c746 {
-  margin-top: calc(1.82 * 5rpx);
+.index .btn.data-v-51e5c746 {
+  position: absolute;
+  top: 48.2%;
+  left: 50%;
+  -webkit-transform: translate(-50%, 0);
+          transform: translate(-50%, 0);
+  width: 549rpx;
+  height: 90rpx;
   opacity: 1;
-  font-size: calc(1.82 * 10rpx);
-  font-family: YouSheBiaoTiHei, YouSheBiaoTiHei-Regular;
-  font-weight: calc(1.82 * 400);
-  text-align: center;
-  color: #ffffff;
-}
-.index .top .tit2.data-v-51e5c746 {
-  margin-top: calc(1.82 * 10rpx);
-  opacity: 1;
-  font-size: 36rpx;
-  font-family: SourceHanSansCN-Regular;
-  text-align: center;
-  color: #ffffff;
-  line-height: 31rpx;
-  letter-spacing: 0rpx;
-}
-.index .center.data-v-51e5c746 {
-  margin-top: 31rpx;
-  border: 2rpx solid red;
-}
-.index .center .item .top-tit.data-v-51e5c746 {
-  opacity: 1;
-  font-size: 20rpx;
-  font-family: SourceHanSansCN-Regular;
-  text-align: center;
-  color: #9b9b9b;
-  line-height: 31rpx;
-  letter-spacing: 0rpx;
-}
-.index .center .item .container .user1.data-v-51e5c746 {
+  background: -webkit-linear-gradient(353deg, #ffe9c5 18%, #ffd88a 91%);
+  background: linear-gradient(97deg, #ffe9c5 18%, #ffd88a 91%);
+  border-radius: 42rpx;
   display: -webkit-box;
   display: -webkit-flex;
   display: flex;
@@ -80,48 +55,49 @@
   -webkit-align-items: center;
           align-items: center;
 }
-.index .center .item .container .user1 .pic.data-v-51e5c746 {
-  width: 92rpx;
-  height: 92rpx;
+.index .btn .tit1.data-v-51e5c746 {
   opacity: 1;
-  margin: 0 9rpx 0 49rpx;
+  font-size: 29rpx;
+  font-family: PingFang SC, PingFang SC-Bold;
+  font-weight: 700;
+  color: #af0000;
+  line-height: 90rpx;
+  margin-left: 217rpx;
 }
-.index .center .item .container .user1 .hb.data-v-51e5c746 {
-  width: 478rpx;
-  height: 138rpx;
+.index .btn .tit2.data-v-51e5c746 {
+  margin-left: 112rpx;
+}
+.index .txt1.data-v-51e5c746 {
+  position: absolute;
+  top: 62%;
+  left: 50%;
   opacity: 1;
+  font-size: 29rpx;
+  font-family: PingFang SC, PingFang SC-Heavy;
+  font-weight: 800;
+  color: #af0000;
+  -webkit-transform: translate(-50%, 0);
+          transform: translate(-50%, 0);
 }
-.index .center .footer.data-v-51e5c746 {
-  margin-left: 50%;
-  -webkit-transform: translateX(-50%);
-          transform: translateX(-50%);
-  margin-top: 30rpx;
-  width: 288rpx;
-  height: 45rpx;
-  opacity: 1;
-  border: 2rpx solid blue;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: flex;
-  -webkit-box-align: center;
-  -webkit-align-items: center;
-          align-items: center;
+.index .txt2.data-v-51e5c746 {
+  position: absolute;
+  top: 69.8%;
+  left: 50%;
+  font-size: 22rpx;
+  -webkit-transform: translate(-50%, 0);
+          transform: translate(-50%, 0);
+  font-weight: 800;
 }
-.index .center .footer .hbIcon.data-v-51e5c746 {
-  width: 24rpx;
-  height: 24rpx;
-  opacity: 1;
-  margin: 0 19rpx 0 36rpx;
+.index .txt3.data-v-51e5c746 {
+  position: absolute;
+  top: 75.2%;
+  left: 50%;
+  font-size: 22rpx;
+  -webkit-transform: translate(-50%, 0);
+          transform: translate(-50%, 0);
+  font-weight: 800;
 }
-.index .center .footer .tit.data-v-51e5c746 {
-  font-size: 20rpx;
-  font-family: SourceHanSansCN-Regular;
-  text-align: center;
-  color: #9b9b9b;
-  line-height: 31rpx;
-  letter-spacing: 0rpx;
-}
-.index .center .footer .tit text.data-v-51e5c746 {
-  color: #D82423;
+.data-v-51e5c746 .u-tabbar__content__circle__border {
+  display: none !important;
 }
 

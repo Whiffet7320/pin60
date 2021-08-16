@@ -43,6 +43,12 @@
   height: 36rpx;
   opacity: 1;
 }
+.container .nav1 .pic1.cg.data-v-685ad89c {
+  margin-left: 89rpx;
+  width: 72rpx;
+  height: 72rpx;
+  opacity: 1;
+}
 .container .nav1 .tit1.data-v-685ad89c {
   margin-left: 18rpx;
   opacity: 1;
@@ -127,6 +133,8 @@
   margin-top: 27rpx;
 }
 .container .nav2 .content .tit3 .btn1.data-v-685ad89c {
+  margin: 0;
+  padding: 0;
   width: 167rpx;
   height: 58rpx;
   opacity: 1;

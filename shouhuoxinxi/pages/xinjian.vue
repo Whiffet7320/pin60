@@ -2,28 +2,28 @@
 	<view class="index">
 		<view class="container">
 			<view class="navitem nav1">
-				<image class="pic1" src="/static/路径308.png" mode=""></image>
+				<image class="pic1" src="/static/lujin308.png" mode=""></image>
 				<view class="tit1">收 货 人</view>
 				<u-input placeholder="请填写收货人姓名" v-model="realname" type="text" :border="false" height="40" />
 			</view>
 			<view class="navitem nav2">
-				<image class="pic1" src="/static/路径309.png" mode=""></image>
+				<image class="pic1" src="/static/lujin309.png" mode=""></image>
 				<view class="tit1">联系方式</view>
 				<u-input placeholder="请填写收货人联系方式" v-model="mobile" type="text" :border="false" height="40" />
 			</view>
 			<view class="navitem nav3">
-				<image class="pic1" src="/static/路径310.png" mode=""></image>
+				<image class="pic1" src="/static/lujin310.png" mode=""></image>
 				<view class="tit1">所在城市</view>
 				<u-input @click="showPCA" disabled placeholder="请填写收货人所在城市" v-model="city" type="text" :border="false"
 					height="40" />
 			</view>
 			<view class="navitem nav4">
-				<image class="pic1" src="/static/路径311.png" mode=""></image>
+				<image class="pic1" src="/static/lujin311.png" mode=""></image>
 				<view class="tit1">详细地址</view>
 				<u-input placeholder="请填写收货人详细地址" v-model="address" type="text" :border="false" height="40" />
 			</view>
 			<view class="navitem nav5">
-				<image class="pic1" src="/static/路径311.png" mode=""></image>
+				<image class="pic1" src="/static/lujin311.png" mode=""></image>
 				<view class="tit1">设置为默认地址</view>
 				<u-switch v-model="is_default"></u-switch>
 			</view>
